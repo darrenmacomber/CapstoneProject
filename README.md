@@ -85,3 +85,4 @@ Using an API that has publishing info to fill book data. (Author, publishing dat
   - [ ] Filtering tags and users
   - [ ] Following profiles
   - [ ] Schedule, Calender
+  - [ ] Try for TV shows
