@@ -76,19 +76,39 @@ Using an API that has publishing info to fill book data. (Author, publishing dat
 * Profile database
   - Access permissions
   - Bio info/tags
-  - Books read
-  - How much of each book read
-  - User rating for books
-  - Activity record/dates
 * Book database
   - Book info sourced from API
   - Book activity history
   - User applied tags
+* ProfileBook
+  - Profile ID (ForeignKey)
+  - Book ID (ForeignKey)
+  - PercentCompleted (int)
+  - Rating (int)
+  - Date Started
+  - Date Completed
+* Tag
+  - Text
+  - Profile (ManyToMany)
+
 
 ## Schedule
 
-### Week 1 Goals
-
+### Milestone 1 Goals
+  - User login
+  - Set up Book model
+  - Link in API to populate database for Book Model
+  - Index for book
+  - Model for Profile
+  - Let user save Books to Profile and create ProfileBook Model
+  - Templates
 ### Week 2 Goals
-
+  - Blog function
+  - Blog Post
+  - Blog Comment
+  - Tag and search function
+  - Templates
 ### Week 3 Goals
+  - Filtering tags and users
+  - Following profiles
+  - Schedule, Calender
