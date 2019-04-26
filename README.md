@@ -1,100 +1,89 @@
-# OpenTable (placeholder)
+# MediaShelf (placeholder)
 
 ## Concept
-This app is designed to support traditional board game play in an online setting with multiple players jumping in and out of games. It will be something like a Roll20 clone. It will have multiple die-rolling functions through Python, profile pages for players and game organizers, options for uploading rules to the site, wish lists for players looking for groups and organizers looking for players. A chatroom-style interface accessible to players and organizers will be the means through which actual games are played. If there is time, I will add a game/player search function.
+An app designed to accommodate group reading and watching of media. Similar to GoodReads, basic functionality will allow for making a personalized profile that keeps track of what books you read, where you are in them, and how much you liked them. You can post blog entries about your experiences with the work and others can search and find them by keywords for your blog or the books you read. Other accounts can discuss with you by commenting on your posts. You will be able to filter out comments and profiles regarding works you're reading by accounts that are recorded as being further in the work than you are, avoiding spoilers.
 
 ### Functions
-* Die rolling system
+(Start with just books then expand to other types of media)
+* Media Blog
 * Personalized profile pages
   - Bio
-  - Blog
-  - Playgroup Records
-  - Game Wish List
-* Game/Die/Record keeping customizability (Ties into Playgroup Records)
-* Scheduling system (Ties into Bio)
-* Forum-style playgroup page.
+  - Blog and comment section
+  - Works consumed
+  - Ratings for books consumed
+  - History and progress through books
+* Customize who can access your profile and who can comment/ whose profiles you can see based on their history.
+* Calendar, useful for keeping up with TV or chapters released on a schedule.
+* Search function
 
 ### Problems Solved
 - [ ] Determine which Frameworks to use
-- [ ] Determine the models for game sessions
-- [ ] Create database for game sessions
-- [ ] Determine the models for profiles
-- [ ] Create database for profiles
-- [ ] Determine the models for social function
-- [ ] Create database for social function
-- [ ] Figure out how to tie interface to each database API style
+- [ ] Determine the models for books and profiles
+- [ ] Create database and tables for books/profiles
+- [ ] Create views
+- [ ] Create navigable blog index and individual pages for books
+- [ ] Tie to database
 - [ ] Front End and formatting
 
 ### Libraries/Frameworks
-TBD
+Using an API that has publishing info to fill book data. (Author, publishing date, etc.)
 
 ## Functionality
 
 ### Interface
 * User login
-* Profile page
-  - Play Records pages
-  - Simple blog posts
-  - Wish List page
-* Game Organizer page
-  - Play Records pages
-  - Rule customization page
-  - Piece image uploading
-  - Rulebook
-* Campaign page for actual play
-  - Roll field
-  - Board field
-  - Chat room
-* Forum page
-  - Campaign organizing rooms
-  - Player search
-  - Campaign search
+* Profile Page (Customizable when logged in)
+  - Books (link to Book Page)
+  - Bio/personal info/book preferences (Can make specific fields searchable)
+  - Schedule (Books you're interested in reading, schedule progress)
+* Book Page (Customizable to admin)
+  - Brief description
+  - Book data (Searchable tags, publish date, language, length)
+  - Cover images
+  - Activity history (Number of readers, how many/how much finished, links to public Profile Pages)
+* Index Page
+  - Main field (Recent additions to Books)
+  - Chat field (Recent posts by public Profile Pages)
+  - Search function (Books, public Profile Pages w/ tag)
+* Search Page
+  - Main Field (List of results, type (Book/Profile))
+  - Customize search to include any portion of or exact terms
+  - Preset Searches (Most popular, most recently added, most completed)
+  - Random book function
 
 ### Data Input
-* Profile data
-  - Bio (Personal info, schedule, etc.)
-  - Play records (History of recent sessions)
-  - Wish List (What systems you want to play; searchable)
+* Profile Page
+  - Bio (Personal info, tags for genre and book characteristics, can make own)
+  - Reading records (History of recent activity, can remove or edit)
+  - Wish List (Add Books you haven't read yet but want to)
   - Blog posts (Twitter-style comments on your page)
-* Playgroup data
-  - Players involved
-  - Game data for each player
-  - Rolls
-  - History
-  - Chat
-* Game organization data
-  - Basic description
-  - Select ruleset
-  - Add players
-  - Add custom rules
-  - Update history
-* Forum data
-  - Make page for campaign
-  - Search players
-  - Search organizers
+  - Filter settings (Set books you want to receive comments from, profiles you want to be able to see if they are private and have the appropriate setting enabled for that specific book, or are public)
+* Book Page
+  - Brief description (Admin writes quick summary to be displayed)
+  - Book data (Sourced from API but admin can manipulate)
+  - Book tags (Draw from Book data, users can also add and remove tags)
+  - Cover images (Upload image)
+  - Activity history (Takes info from database to show usage history/data)
+* Index pages
+  - Navigator (Links to various other pages like search page)
+  - Hide/Show (Linked to user profile, can hide parts of the index like the chat window, etc.)
+* Search Input
+  - Search terms (Input that receives search info and looks through dictionary of tags in database to find relevant Book and Profiles)
+  - Search filters (Input to remove certain terms and types of results from the output)
+  - Preset searches (Buttons automatically fill terms and filters according to preset specifications to simplify searching)
 
 ### Back-End/Data
 * Profile database
-  - Bio info
-  - Games invitations
-  - Games run
-  - Wishlist data
-  - History of posts
-  - Activity record/dates
-* Game database
-  - Dice info
-  - Rulesets
-* Session database
-  - Players invited
-  - Rulesets used
-  - Player game records
-  - Session records
   - Access permissions
-* Forum database
-  - Game data
-  - Timezone data
-  - Profile data
-  - Tags data
+  - Bio info/tags
+  - Books read
+  - How much of each book read
+  - User rating for books
+  - Activity record/dates
+* Book database
+  - Book info sourced from API
+  - Book activity history
+  - User applied tags
 
 ## Schedule
 
