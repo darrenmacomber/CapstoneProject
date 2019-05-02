@@ -11,17 +11,19 @@
       <input type="text" v-model="search_books"/></input>
       <button v-on:click="searchRepos">search</button>
       <div id="book_data">
-        <div v-for="doc in docs">
-          <div><a>ID: [[doc.id]]</a></div>
-          <div><a>Title: [[ doc.title ]]</a></div>
-          <div><a>Author: [[ doc.author ]]</a></div>
-          <div><a>Languages: [[ doc.language ]]</a></div>
-          <div><a>Edition: [[ doc.edition ]]</a></div>
-          <div><a>Year Published: [[ doc.publish_year ]]</a></div>
-          <div><a>ISBN: [[ doc.isbn ]]</a></div>
-          <div><a>GoodReads ID: [[ doc.id_goodreads ]]</a></div>
-          <div><a>Subject Tags: [[ doc.subject_tags ]]</a></div>
-          <div><a>User Tags: [[ doc.user_tags ]]</a></div>
+        <div v-for="item in items">
+          <div><a>ID: [[item.id]]</a></div>
+          <div><a>Title: [[ item.title ]]</a></div>
+          <div><a>Author: [[ item.author ]]</a></div>
+          <div><a>Languages: [[ item.languages ]]</a></div>
+          <div><a>Pages: [[ item.page_count ]]</a></div>
+          <div><a>Published: [[ item.publish_date ]]</a></div>
+          <div><a>Publisher: [[ item.publisher ]]</a></div>
+          <div><a>ISBN: [[ item.isbn_array ]]</a></div>
+          <div><a>Type: [[ item.print_type ]]</a></div>
+          <div><a>Categories: [[ item.categories ]]</a></div>
+          <div><a>User Categories: [[ item.usertags ]]</a></div>
+          <div><a>Description:<br> [[ item.description ]]</a></div>
           <hr/>
         </div>
       </div>
@@ -32,11 +34,11 @@
         delimiters: ['[[', ']]'],
         data: {
           search_books: 'search books here',
-          docs: [],
+          items: [],
         },
         methods: {
           searchRepos: function() {
-            let url = 'http://openlibrary.org/search.json'
+            let url = "https://www.googleapis.com/books/v1/volumes?"
             let config = {
               params: {
                 q: this.search_books
@@ -45,26 +47,46 @@
             axios.get(url, config).then(response => {
               console.log(response.data)
               let data = response.data
-              this.docs = []
+              this.items = []
               this.authors = ''
-                for (let i=0; i<data.docs.length; ++i) {
-                  this.docs.push({
-                    id: this.id,
-                    title: data.docs[i].title,
-                    author: data.docs[i].author_name,
-                    author_key: data.docs[i].author_key,
-                    language: data.docs[i].language,
-                    edition_count: data.docs[i].edition_count,
-                    edition_key: data.docs[i].edition_key,
-                    publish_date: data.docs[i].publish_date,
-                    publish_year: data.docs[i].first_publish_year,
-                    isbn: data.docs[i].isbn,
-                    id_goodreads: data.docs[i].id_goodreads,
-                    subject_tags: data.docs[i].subject,
-                    user_tags: [],
-                    // user_id
-                    // id corresponds to book in API
-                    //
+                for (let i=0; i<data.items.length; ++i) {
+                  let id = data.items[i].id
+                  let title = data.items[i].volumeInfo.title
+                  let authors = ''
+                  if (data.items[i].volumeInfo.authors)
+                    authors = data.items[i].volumeInfo.authors.join(', ')
+                  let languages = data.items[i].volumeInfo.language
+                  let page_count = data.items[i].volumeInfo.pageCount
+                  let publish_date = data.items[i].volumeInfo.publishedDate
+                  let publisher = data.items[i].volumeInfo.publisher
+                  let isbn_array = ''
+                  for (let j=0; j<data.items[i].volumeInfo.industryIdentifiers.length; ++j)
+                    isbn_array data.items[i].volumeInfo.industryIdentifiers[j]["identifier"].join(', ')
+                  let print_type = data.items[i].volumeInfo.printType
+                  let category_tags = data.items[i].volumeInfo.categories
+                  let categories = ''
+                  if (data.items[i].volumeInfo.categories)
+                    categories = data.items[i].volumeInfo.categories.join(', ')
+                  let user_tags = []
+                  let usertags = ''
+                  //usertag function goes here//
+                  let description = data.items[i].volumeInfo.description
+                  let thumbnail = data.items[i].volumeInfo.imageLinks.thumbnail
+                  this.items.push({
+                    id: id,
+                    title: title,
+                    authors: authors,
+                    languages: languages,
+                    page_count: page_count,
+                    publish_date: publish_date,
+                    publisher: publisher,
+                    isbn_array: isbn_array,
+                    print_type: print_type,
+                    category_tags: category_tags,
+                    categories: categories,
+                    user_tags: user_tags,
+                    description: description,
+                    thumbnail: thumbnail,
                   })
                 }
               })
