@@ -1,0 +1,56 @@
+class Book(models.Model):
+    api_id = models.IntegerField()
+    title = models.CharField(max_length=200)
+    languages = ManyToManyField(Language)
+    edition = models.IntegerField()
+    publish_year = models.IntegerField()
+    isbn = models.charField(max_length=200)
+    subject_tags = models.ManyToManyField(subject_tags)
+    user_tags = models.ManyToManyField(user_tags)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+class Author(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+class SaveBook(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.PROTECT, related_name='save_book')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='save_book')
+    save_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.book.title
+
+def get_book(request):
+
+    # data = {
+    #     'todos': [{
+    #         'text': 'walk the dog'
+    #     },{
+    #         'text': 'butter the cat'
+    #     }]
+    # }
+
+    data = {'books': []}
+    book_items = BookAjaxItem.objects.all()
+    for book_item in book_items:
+        data['books'].append({
+            'text': book_item.authors
+        })
+        #data['todos'].append(todo_item) #Object of type 'TodoAjaxItem' is not JSON serializable
+    # print(data)
+    return JsonResponse(data)
+
+
+def save_todo(request):
+    data = json.loads(request.body)
+    todo_text = data['todo_text']
+    todo_item = TodoAjaxItem(text=todo_text)
+    todo_item.save()
+    return HttpResponse('ok')

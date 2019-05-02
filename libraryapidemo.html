@@ -1,0 +1,28 @@
+<<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cat API Demo</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- <script src="secrets.js"></script> -->
+    <style type="text/css">
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+    let url = 'http://openlibrary.org/search.json'
+    let config = {
+      params: {
+        q: 'lord of the rings'
+      }
+    }
+    axios.get(url, config).then(function(response) {
+      console.log(response.data)
+    })
+    </script>
+  </body>
+</html>
+
+
+<!-- http://openlibrary.org/search.json?q=the+lord+of+the+rings -->
