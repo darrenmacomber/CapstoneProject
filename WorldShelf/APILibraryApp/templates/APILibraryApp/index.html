@@ -8,21 +8,34 @@
   </head>
   <body>
     <div id="APILibrary">
-      <input type="text" v-model="search_books"/></input>
-      <button v-on:click="searchRepos">search</button>
+      <div id="search_navigator">
+        <input type="text" v-model="search_books"/></input>
+        <span>Page:</span>
+        <button v-on:click="pageBack">←</button>
+        <input type="number" v-model="page"/></input>
+        <button v-on:click="pageForward">→</button>
+        <span>Results Per Page</span>
+        <select v-model="resultsPerPage"/>
+          <option>5</option>
+          <option>10</option>
+          <option>20</option>
+          <option>50</option>
+        </select>
+        <button v-on:click="lookup">🔎</button>
+      </div>
       <div id="book_data">
         <div v-for="item in items">
           <div><a>ID: [[item.id]]</a></div>
           <div><a>Title: [[ item.title ]]</a></div>
-          <div><a>Author: <div v-for="author in item.authors">[[ author ]]</div></a></div>
+          <div><a>Author: <span v-for="author in item.authors">[[ author ]] </span></a></div>
           <div><a>Languages: [[ item.languages ]]</a></div>
           <div><a>Pages: [[ item.page_count ]]</a></div>
           <div><a>Published: [[ item.publish_date ]]</a></div>
           <div><a>Publisher: [[ item.publisher ]]</a></div>
-          <div><a>ISBN: <div v-for="isbn in item.isbn_array">[[ isbn.identifier ]]</div></a></div>
-          <div><a>Type: [[ item.print_type ]]</a></div>
+          <div><a>ISBN: <span v-for="isbn in item.isbn_array">[[ isbn.identifier ]] </span></a></div>
+          <div><a>Ebook: [[ item.is_ebook ]]</a></div>
           <div><a>Categories: [[ item.categories ]]</a></div>
-          <div><a>User Categories: [[ item.usertags ]]</a></div>
+          <div><a>User Tags: [[ item.user_tags ]]</a></div>
           <div><a>Description:<br> [[ item.description ]]</a></div>
           <hr/>
         </div>
@@ -33,22 +46,41 @@
         el: '#APILibrary',
         delimiters: ['[[', ']]'],
         data: {
-          search_books: 'search books here',
+          search_books: 'Enter search info here',
           items: [],
+          resultsPerPage: 10,
+          page: 1,
         },
         methods: {
-          searchRepos: function() {
+          pageForward: function() {
+            this.page += 1
+            this.lookup()
+          },
+
+          pageBack: function() {
+            this.page -= 1
+            this.lookup()
+          },
+
+          pageSelect: function() {
+            this.startIndex = (this.page*10) + 1
+          },
+
+          lookup: function() {
             let url = "https://www.googleapis.com/books/v1/volumes?"
+            let startIndex = (this.page - 1)*this.resultsPerPage
             let config = {
               params: {
-                q: this.search_books
+                q: this.search_books,
+                startIndex: startIndex,
+                maxResults: this.resultsPerPage
               }
             }
             axios.get(url, config).then(response => {
-              console.log(response.data)
+              console.log(response)
               let data = response.data
               this.items = []
-              this.authors = ''
+              this.startIndex = response.data.startIndex
                 for (let i=0; i<data.items.length; ++i) {
                   let id = data.items[i].id
                   let title = data.items[i].volumeInfo.title
@@ -58,13 +90,17 @@
                   let publish_date = data.items[i].volumeInfo.publishedDate
                   let publisher = data.items[i].volumeInfo.publisher
                   let isbn_array = data.items[i].volumeInfo.industryIdentifiers
-                  let print_type = data.items[i].volumeInfo.printType
+                  let ebook = data.items[i].saleInfo.isEbook
+                  let is_ebook = 'No'
+                  if (ebook)
+                    is_ebook = 'Yes'
                   let category_tags = data.items[i].volumeInfo.categories
                   let categories = ''
                   if (data.items[i].volumeInfo.categories)
                     categories = data.items[i].volumeInfo.categories.join(', ')
                   let user_tags = []
-                  let usertags = ''
+                  if (data.user_tags == [])
+                    data.user_tags = ''
                   //usertag function goes here//
                   let description = data.items[i].volumeInfo.description
                   let thumbnail = data.items[i].volumeInfo.imageLinks.thumbnail
@@ -77,7 +113,8 @@
                     publish_date: publish_date,
                     publisher: publisher,
                     isbn_array: isbn_array,
-                    print_type: print_type,
+                    ebook: ebook,
+                    is_ebook: is_ebook,
                     category_tags: category_tags,
                     categories: categories,
                     user_tags: user_tags,
@@ -86,7 +123,13 @@
                   })
                 }
               })
-            }
+            },
+
+            // save_book: function(book) {
+            //   axios.post().then(function(response) {
+            //
+            //   })
+            // }
           }
         })
     </script>

@@ -54,3 +54,16 @@ def save_todo(request):
     todo_item = TodoAjaxItem(text=todo_text)
     todo_item.save()
     return HttpResponse('ok')
+
+
+
+
+    filter_start: this.filter_start,
+    filter_end: this.filter_end,
+    sort_id: this.filter_sort_id,
+
+    currentIndex: 1,
+    filter_start: null,
+    filter_end: null,
+    filter_sort_id: '',
+    filters_closed: true,
