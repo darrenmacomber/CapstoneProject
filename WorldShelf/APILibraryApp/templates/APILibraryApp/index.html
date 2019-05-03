@@ -14,12 +14,12 @@
         <div v-for="item in items">
           <div><a>ID: [[item.id]]</a></div>
           <div><a>Title: [[ item.title ]]</a></div>
-          <div><a>Author: [[ item.author ]]</a></div>
+          <div><a>Author: <div v-for="author in item.authors">[[ author ]]</div></a></div>
           <div><a>Languages: [[ item.languages ]]</a></div>
           <div><a>Pages: [[ item.page_count ]]</a></div>
           <div><a>Published: [[ item.publish_date ]]</a></div>
           <div><a>Publisher: [[ item.publisher ]]</a></div>
-          <div><a>ISBN: [[ item.isbn_array ]]</a></div>
+          <div><a>ISBN: <div v-for="isbn in item.isbn_array">[[ isbn.identifier ]]</div></a></div>
           <div><a>Type: [[ item.print_type ]]</a></div>
           <div><a>Categories: [[ item.categories ]]</a></div>
           <div><a>User Categories: [[ item.usertags ]]</a></div>
@@ -52,16 +52,12 @@
                 for (let i=0; i<data.items.length; ++i) {
                   let id = data.items[i].id
                   let title = data.items[i].volumeInfo.title
-                  let authors = ''
-                  if (data.items[i].volumeInfo.authors)
-                    authors = data.items[i].volumeInfo.authors.join(', ')
+                  let authors = data.items[i].volumeInfo.authors
                   let languages = data.items[i].volumeInfo.language
                   let page_count = data.items[i].volumeInfo.pageCount
                   let publish_date = data.items[i].volumeInfo.publishedDate
                   let publisher = data.items[i].volumeInfo.publisher
-                  let isbn_array = ''
-                  for (let j=0; j<data.items[i].volumeInfo.industryIdentifiers.length; ++j)
-                    isbn_array data.items[i].volumeInfo.industryIdentifiers[j]["identifier"].join(', ')
+                  let isbn_array = data.items[i].volumeInfo.industryIdentifiers
                   let print_type = data.items[i].volumeInfo.printType
                   let category_tags = data.items[i].volumeInfo.categories
                   let categories = ''
