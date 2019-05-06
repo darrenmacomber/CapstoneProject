@@ -9,10 +9,11 @@
   <body>
     <div id="APILibrary">
       <div id="search_navigator">
-        <input type="text" v-model="search_books"/></input>
+        <input type="text" v-model="search_books" v-on:keydown.enter="resetLookup"></input>
         <span>Page:</span>
         <button v-on:click="pageBack">←</button>
         <input type="number" v-model="page"/></input>
+        <button v-on:click="lookup">GoTo</button>
         <button v-on:click="pageForward">→</button>
         <span>Results Per Page</span>
         <select v-model="resultsPerPage"/>
@@ -21,11 +22,12 @@
           <option>20</option>
           <option>50</option>
         </select>
-        <button v-on:click="lookup">🔎</button>
+        <button v-on:click="resetLookup">🔎</button>
       </div>
       <div id="book_data">
         <div v-for="item in items">
-          <div><a>ID: [[item.id]]</a></div>
+          <div><img v-bind:src="item.thumbnail"/></div>
+          <div><a>ID: [[item.bookID]]</a></div>
           <div><a>Title: [[ item.title ]]</a></div>
           <div><a>Author: <span v-for="author in item.authors">[[ author ]] </span></a></div>
           <div><a>Languages: [[ item.languages ]]</a></div>
@@ -35,8 +37,9 @@
           <div><a>ISBN: <span v-for="isbn in item.isbn_array">[[ isbn.identifier ]] </span></a></div>
           <div><a>Ebook: [[ item.is_ebook ]]</a></div>
           <div><a>Categories: [[ item.categories ]]</a></div>
-          <div><a>User Tags: [[ item.user_tags ]]</a></div>
+          <div><a>User Tags: <span v-for="tag in item.user_tags">[[ tag ]]</span></div>
           <div><a>Description:<br> [[ item.description ]]</a></div>
+          <button v-on:click="saveThis(item)">Add Book to MyShelf</button>
           <hr/>
         </div>
       </div>
@@ -58,12 +61,15 @@
           },
 
           pageBack: function() {
-            this.page -= 1
+            if (this.page > 1) {
+              this.page -= 1
+            }
             this.lookup()
           },
 
-          pageSelect: function() {
-            this.startIndex = (this.page*10) + 1
+          resetLookup: function() {
+            this.page = 1
+            this.lookup()
           },
 
           lookup: function() {
@@ -77,12 +83,11 @@
               }
             }
             axios.get(url, config).then(response => {
-              console.log(response)
               let data = response.data
               this.items = []
               this.startIndex = response.data.startIndex
                 for (let i=0; i<data.items.length; ++i) {
-                  let id = data.items[i].id
+                  let bookID = data.items[i].id
                   let title = data.items[i].volumeInfo.title
                   let authors = data.items[i].volumeInfo.authors
                   let languages = data.items[i].volumeInfo.language
@@ -90,6 +95,7 @@
                   let publish_date = data.items[i].volumeInfo.publishedDate
                   let publisher = data.items[i].volumeInfo.publisher
                   let isbn_array = data.items[i].volumeInfo.industryIdentifiers
+                  // let isbn_string = isbn_array.map(x => )
                   let ebook = data.items[i].saleInfo.isEbook
                   let is_ebook = 'No'
                   if (ebook)
@@ -105,7 +111,7 @@
                   let description = data.items[i].volumeInfo.description
                   let thumbnail = data.items[i].volumeInfo.imageLinks.thumbnail
                   this.items.push({
-                    id: id,
+                    bookID: bookID,
                     title: title,
                     authors: authors,
                     languages: languages,
@@ -124,7 +130,31 @@
                 }
               })
             },
-
+            saveThis: function(item) {
+              let app = this
+              let data = {
+                'bookID': item.bookID,
+                'title': item.title,
+                'authors': item.authors,
+                'languages': item.languages,
+                'page_count': item.page_count,
+                'publish_date': item.publish_date,
+                'publisher': item.publisher,
+                'isbn': item.isbn_array.map(x => x.identifier).join(', '),
+                'ebook': item.ebook,
+                'category_tags': item.category_tags,
+                'description': item.description,
+                'thumbnail': item.thumbnail,
+              }
+              let config = {
+                headers: {
+                  'X-CSRFToken': '{{csrf_token}}'
+                }
+              }
+              axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(function(response) {
+                console.log(response.data)
+              })
+            },
             // save_book: function(book) {
             //   axios.post().then(function(response) {
             //
