@@ -68,20 +68,20 @@ Using an API that has publishing info to fill book data. (Author, publishing dat
 ## Schedule
 
 ### Milestone 1 Goals
-  - [ ] User login
-  - [ ] Set up Book model
-  - [ ] Link in API to populate database for Book Model
-  - [ ] Index for book
-  - [ ] Model for Profile
+  - [x] User login
+  - [x] Set up Book model
+  - [x] Link in API
+  - [x] Search API Function
+  - [x] Set up Book View
   - [ ] Let user save Books to Profile and create ProfileBook Model
+  - [x] Templates
+### Milestone 2 Goals
+  - [ ] User Profile Template
+  - [ ] User Tag Model
+  - [ ] User Search Index
+  - [ ] Add Tag View
   - [ ] Templates
-### Week 2 Goals
-  - [ ] Blog function
-  - [ ] Blog Post
-  - [ ] Blog Comment
-  - [ ] Tag and search function
-  - [ ] Templates
-### Week 3 Goals
+### Milestone 3 Goals
   - [ ] Filtering tags and users
   - [ ] Following profiles
   - [ ] Schedule, Calender
