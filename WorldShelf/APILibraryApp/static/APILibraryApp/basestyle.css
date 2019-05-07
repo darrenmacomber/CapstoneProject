@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css?family=Cormorant+Garamond');
+@import url('https://fonts.googleapis.com/css?family=Comfortaa');
+
+<style>
+.header_bar > *{
+  background-color: beige;
+  font-family: 'Cormorant Garamond';
+}
+
+.title {
+  background-color: beige;
+  font-family: 'Cormorant Garamond';
+  font-size: 25px;
+}
+
+body {
+  background-color: grey;
+  font-family: 'Comfortaa';
+  margin: 5%;
+}
+
+.navigator_bar {
+  background-color: beige;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: 5px;
+  padding: 5px;
+}
+
+#index_button {
+  background: white;
+  border-radius: 10px;
+  border: 2px solid black;
+  padding: 10px;
+  margin: 10px;
+  font-size: 20px;
+}
+
+.data_field > * {
+  background-color: beige;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 10px;
+}
+
+#book_entry > .entry_field {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 5px;
+}
+
+#add_button {
+  background-color: white;
+  border-radius: 10px;
+  font-family: 'Comfortaa';
+  font-size: 18px;
+  margin: 2px;
+  padding: 5px;
+}
+
+</style>

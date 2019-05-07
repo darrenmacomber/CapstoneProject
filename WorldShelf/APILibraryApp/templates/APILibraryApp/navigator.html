@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+  <html lang="en" dir="ltr">
+    <head>
+      <meta charset="utf-8">
+      <title>WorldShelf</title>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <header>
+      <div class="container" id="header_bar">
+        <div class="title">
+          <h1>WorldShelf: Your Personal Online Bookshelf</h1>
+        </div>
+        <div class="navigator_bar" id="index_bar">
+          <div class="container" id="index_button">
+            <span><a>Home</a></span>
+          </div>
+          <div class="container" id="index_button">
+            <span><a>Search Books</a></span>
+          </div>
+          <div class="container" id="index_button">
+            <span><a>Search Tags</a></span>
+          </div>
+          <div class="container" id="index_button">
+            <span><a>Profile</a></span>
+          </div>
+          <div class="container" id="index_button">
+            <span><a>Register/Login</a></span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <body>
+    {% block index_content %}{% endblock %}
+  </body>
+  </html>

@@ -8,9 +8,13 @@ def index(request):
     return render(request, 'APILibraryApp/index.html')
 
 def saveBook(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('failure')
     data = json.loads(request.body)
     print(data)
     bookID = data['bookID']
+    if Book.objects.filter(bookID = bookID).exists():
+        return HttpResponse('already added')
     title = data['title']
     languages = data['languages']
     page_count = data['page_count']
@@ -34,4 +38,4 @@ def saveBook(request):
     for category in category_array:
         category, created = Category.objects.get_or_create(name=category)
         book.category_tags.add(category)
-    return HttpResponse('ok')
+    return HttpResponse('success')

@@ -1,46 +1,53 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  </head>
+{% extends "APILibraryApp/navigator.html" %}
+<html>
+{% load static %}
+{% block index_content %}
   <body>
+    <link rel="stylesheet" type="text/css" href="{% static 'APILibraryApp/basestyle.css' %}">
     <div id="APILibrary">
-      <div id="search_navigator">
-        <input type="text" v-model="search_books" v-on:keydown.enter="resetLookup"></input>
-        <span>Page:</span>
-        <button v-on:click="pageBack">←</button>
-        <input type="number" v-model="page"/></input>
-        <button v-on:click="lookup">GoTo</button>
-        <button v-on:click="pageForward">→</button>
-        <span>Results Per Page</span>
-        <select v-model="resultsPerPage"/>
-          <option>5</option>
-          <option>10</option>
-          <option>20</option>
-          <option>50</option>
-        </select>
-        <button v-on:click="resetLookup">🔎</button>
+      <div class="navigator_bar" id="search_bar">
+        <div class="container" id="navigator_input">
+          <input type="text" v-model="search_books" v-on:keydown.enter="resetLookup"></input>
+        </div>
+        <div class="container" id="navigator_input">
+          <span>Page:</span>
+          <button v-on:click="pageBack">←</button>
+          <input type="number" v-model="page"/></input>
+          <button v-on:click="lookup">GoTo</button>
+          <button v-on:click="pageForward">→</button>
+        </div>
+        <div class="container" id="navigator_input">
+          <span>Results Per Page</span>
+          <select v-model="resultsPerPage"/>
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+          </select>
+        </div>
+        <div class="button" id="search_button">
+          <button v-on:click="resetLookup">🔎</button>
+        </div>
       </div>
-      <div id="book_data">
-        <div v-for="item in items">
-          <div><img v-bind:src="item.thumbnail"/></div>
-          <div><a>ID: [[item.bookID]]</a></div>
-          <div><a>Title: [[ item.title ]]</a></div>
-          <div><a>Author: <span v-for="author in item.authors">[[ author ]] </span></a></div>
-          <div><a>Languages: [[ item.languages ]]</a></div>
-          <div><a>Pages: [[ item.page_count ]]</a></div>
-          <div><a>Published: [[ item.publish_date ]]</a></div>
-          <div><a>Publisher: [[ item.publisher ]]</a></div>
-          <div><a>ISBN: <span v-for="isbn in item.isbn_array">[[ isbn.identifier ]] </span></a></div>
-          <div><a>Ebook: [[ item.is_ebook ]]</a></div>
-          <div><a>Categories: [[ item.categories ]]</a></div>
-          <div><a>User Tags: <span v-for="tag in item.user_tags">[[ tag ]]</span></div>
-          <div><a>Description:<br> [[ item.description ]]</a></div>
-          <button v-on:click="saveThis(item)">Add Book to MyShelf</button>
-          <hr/>
+      <div class="data_field" id="book_data">
+        <div class="container" id="book_entry" v-for="item in items">
+          <div class="image"><img v-bind:src="item.thumbnail"/></div>
+          <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
+          <div class="entry_field"><a>Title: [[ item.title ]]</a></div>
+          <div class="entry_field"><a>Author: <span v-for="author in item.authors">[[ author ]] </span></a></div>
+          <div class="entry_field"><a>Languages: [[ item.languages ]]</a></div>
+          <div class="entry_field"><a>Pages: [[ item.page_count ]]</a></div>
+          <div class="entry_field"><a>Published: [[ item.publish_date ]]</a></div>
+          <div class="entry_field"><a>Publisher: [[ item.publisher ]]</a></div>
+          <div class="entry_field"><a>ISBN: <span v-for="isbn in item.isbn_array">[[ isbn.identifier ]] </span></a></div>
+          <div class="entry_field"><a>Ebook: [[ item.is_ebook ]]</a></div>
+          <div class="entry_field"><a>Categories: <span v-for="tag in item.category_tags">[[ tag ]]</span></a></div>
+          <div class="entry_field"><a>User Tags: <span v-for="tag in item.user_tags">[[ tag ]]</span></a></div>
+          <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
+          <div class="container" id="add_container">
+            <button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button>
+          </div>
+          <div><hr/></div>
         </div>
       </div>
     </div>
@@ -72,6 +79,13 @@
             this.lookup()
           },
 
+          checkValue: function(value) {
+            if (!value) {
+              return ''
+            }
+            return value
+          },
+
           lookup: function() {
             let url = "https://www.googleapis.com/books/v1/volumes?"
             let startIndex = (this.page - 1)*this.resultsPerPage
@@ -86,82 +100,86 @@
               let data = response.data
               this.items = []
               this.startIndex = response.data.startIndex
-                for (let i=0; i<data.items.length; ++i) {
-                  let bookID = data.items[i].id
-                  let title = data.items[i].volumeInfo.title
-                  let authors = data.items[i].volumeInfo.authors
-                  let languages = data.items[i].volumeInfo.language
-                  let page_count = data.items[i].volumeInfo.pageCount
-                  let publish_date = data.items[i].volumeInfo.publishedDate
-                  let publisher = data.items[i].volumeInfo.publisher
-                  let isbn_array = data.items[i].volumeInfo.industryIdentifiers
-                  // let isbn_string = isbn_array.map(x => )
-                  let ebook = data.items[i].saleInfo.isEbook
-                  let is_ebook = 'No'
-                  if (ebook)
-                    is_ebook = 'Yes'
-                  let category_tags = data.items[i].volumeInfo.categories
-                  let categories = ''
-                  if (data.items[i].volumeInfo.categories)
-                    categories = data.items[i].volumeInfo.categories.join(', ')
-                  let user_tags = []
-                  if (data.user_tags == [])
-                    data.user_tags = ''
-                  //usertag function goes here//
-                  let description = data.items[i].volumeInfo.description
-                  let thumbnail = data.items[i].volumeInfo.imageLinks.thumbnail
-                  this.items.push({
-                    bookID: bookID,
-                    title: title,
-                    authors: authors,
-                    languages: languages,
-                    page_count: page_count,
-                    publish_date: publish_date,
-                    publisher: publisher,
-                    isbn_array: isbn_array,
-                    ebook: ebook,
-                    is_ebook: is_ebook,
-                    category_tags: category_tags,
-                    categories: categories,
-                    user_tags: user_tags,
-                    description: description,
-                    thumbnail: thumbnail,
-                  })
-                }
-              })
-            },
-            saveThis: function(item) {
-              let app = this
-              let data = {
-                'bookID': item.bookID,
-                'title': item.title,
-                'authors': item.authors,
-                'languages': item.languages,
-                'page_count': item.page_count,
-                'publish_date': item.publish_date,
-                'publisher': item.publisher,
-                'isbn': item.isbn_array.map(x => x.identifier).join(', '),
-                'ebook': item.ebook,
-                'category_tags': item.category_tags,
-                'description': item.description,
-                'thumbnail': item.thumbnail,
+              for (let i=0; i<data.items.length; ++i) {
+                let bookID = data.items[i].id
+                let title = data.items[i].volumeInfo.title
+                let authors = data.items[i].volumeInfo.authors
+                let languages = data.items[i].volumeInfo.language
+                let page_count = data.items[i].volumeInfo.pageCount
+                page_count = this.checkValue(page_count)
+                let publish_date = data.items[i].volumeInfo.publishedDate
+                publish_date = this.checkValue(publish_date)
+                let publisher = data.items[i].volumeInfo.publisher
+                publisher = this.checkValue(publisher)
+                let isbn_array = data.items[i].volumeInfo.industryIdentifiers
+                // let isbn_string = isbn_array.map(x => )
+                let ebook = data.items[i].saleInfo.isEbook
+                let is_ebook = 'No'
+                if (ebook)
+                  is_ebook = 'Yes'
+                let category_tags = data.items[i].volumeInfo.categories
+                let user_tags = data.user_tags
+                //usertag function goes here//
+                let description = data.items[i].volumeInfo.description
+                description = this.checkValue(description)
+                let thumbnail = ''
+                if (data.items[i].volumeInfo.imageLinks)
+                  thumbnail = data.items[i].volumeInfo.imageLinks.thumbnail
+                this.items.push({
+                  bookID: bookID,
+                  title: title,
+                  authors: authors,
+                  languages: languages,
+                  page_count: page_count,
+                  publish_date: publish_date,
+                  publisher: publisher,
+                  isbn_array: isbn_array,
+                  ebook: ebook,
+                  is_ebook: is_ebook,
+                  category_tags: category_tags,
+                  user_tags: user_tags,
+                  description: description,
+                  thumbnail: thumbnail,
+                })
               }
-              let config = {
-                headers: {
-                  'X-CSRFToken': '{{csrf_token}}'
-                }
+            })
+          },
+          saveThis: function(item) {
+            let app = this
+            let data = {
+              'bookID': item.bookID,
+              'title': item.title,
+              'authors': item.authors,
+              'languages': item.languages,
+              'page_count': item.page_count,
+              'publish_date': item.publish_date,
+              'publisher': item.publisher,
+              'isbn': item.isbn_array.map(x => x.identifier).join(', '),
+              'ebook': item.ebook,
+              'category_tags': item.category_tags,
+              'description': item.description,
+              'thumbnail': item.thumbnail,
+            }
+            let config = {
+              headers: {
+                'X-CSRFToken': '{{csrf_token}}'
               }
-              axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(function(response) {
-                console.log(response.data)
-              })
-            },
-            // save_book: function(book) {
-            //   axios.post().then(function(response) {
-            //
-            //   })
-            // }
-          }
-        })
+            }
+            axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(function(response) {
+              console.log(response.data)
+
+              if (response.data == 'failure') {
+                alert('Please log in.')
+              } else if (response.data == 'already added') {
+                alert('Already added.')
+              } else {
+                alert('Successfully added.')
+              }
+            })
+          },
+        }
+      })
     </script>
   </body>
+{% endblock %}
 </html>
