@@ -106,18 +106,23 @@
                 let authors = data.items[i].volumeInfo.authors
                 let languages = data.items[i].volumeInfo.language
                 let page_count = data.items[i].volumeInfo.pageCount
-                page_count = this.checkValue(page_count)
+                if (!page_count)
+                  page_count = 0
                 let publish_date = data.items[i].volumeInfo.publishedDate
                 publish_date = this.checkValue(publish_date)
                 let publisher = data.items[i].volumeInfo.publisher
                 publisher = this.checkValue(publisher)
-                let isbn_array = data.items[i].volumeInfo.industryIdentifiers
+                let isbn_array = []
+                if (data.items[i].volumeInfo.industryIdentifiers)
+                  isbn_array = data.items[i].volumeInfo.industryIdentifiers
                 // let isbn_string = isbn_array.map(x => )
                 let ebook = data.items[i].saleInfo.isEbook
                 let is_ebook = 'No'
                 if (ebook)
                   is_ebook = 'Yes'
-                let category_tags = data.items[i].volumeInfo.categories
+                let category_tags = []
+                if (data.items[i].volumeInfo.categories)
+                  category_tags = data.items[i].volumeInfo.categories
                 let user_tags = data.user_tags
                 //usertag function goes here//
                 let description = data.items[i].volumeInfo.description

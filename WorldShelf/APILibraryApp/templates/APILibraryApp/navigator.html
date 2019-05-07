@@ -13,24 +13,23 @@
         </div>
         <div class="navigator_bar" id="index_bar">
           <div class="container" id="index_button">
-            <span><a>Home</a></span>
+            <span><a href="{% url 'users:protected' %}">Profile</a></span>
           </div>
           <div class="container" id="index_button">
-            <span><a>Search Books</a></span>
+            <span><a href="{% url 'APILibraryApp:index' %}">Search Books</a></span>
           </div>
           <div class="container" id="index_button">
             <span><a>Search Tags</a></span>
           </div>
           <div class="container" id="index_button">
-            <span><a>Profile</a></span>
-          </div>
-          <div class="container" id="index_button">
-            <span><a>Register/Login</a></span>
+            <span><a href="{% url 'users:register_login' %}">Register/Login</a></span>
           </div>
         </div>
       </div>
     </header>
     <body>
     {% block index_content %}{% endblock %}
+    {% block profile_content %}{% endblock %}
+    {% block register_content %}{% endblock %}
   </body>
   </html>
