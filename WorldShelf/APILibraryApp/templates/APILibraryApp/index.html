@@ -1,9 +1,8 @@
 {% extends "APILibraryApp/navigator.html" %}
-<html>
 {% load static %}
-{% block index_content %}
-  <body>
+{% block content %}
     <link rel="stylesheet" type="text/css" href="{% static 'APILibraryApp/basestyle.css' %}">
+    <!--Links CSS Sheet in Static  -->
     <div id="APILibrary">
       <div class="navigator_bar" id="search_bar">
         <div class="container" id="navigator_input">
@@ -12,23 +11,23 @@
         <div class="container" id="navigator_input">
           <span>Page:</span>
           <button v-on:click="pageBack">←</button>
-          <input type="number" v-model="page"/></input>
+          <input type="number" v-model="page"></input>
           <button v-on:click="lookup">GoTo</button>
           <button v-on:click="pageForward">→</button>
         </div>
         <div class="container" id="navigator_input">
           <span>Results Per Page</span>
-          <select v-model="resultsPerPage"/>
+          <select v-model="resultsPerPage">
             <option>5</option>
             <option>10</option>
             <option>20</option>
-            <option>50</option>
           </select>
         </div>
         <div class="button" id="search_button">
           <button v-on:click="resetLookup">🔎</button>
         </div>
       </div>
+      <!-- Navigator bar flexbox containing search parameters -->
       <div class="data_field" id="book_data">
         <div class="container" id="book_entry" v-for="item in items">
           <div class="image"><img v-bind:src="item.thumbnail"/></div>
@@ -185,6 +184,4 @@
         }
       })
     </script>
-  </body>
 {% endblock %}
-</html>

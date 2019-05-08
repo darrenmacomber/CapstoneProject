@@ -1,8 +1,6 @@
 {% extends "APILibraryApp/navigator.html" %}
-<html>
 {% load static %}
-{% block profile_content %}
-  <body>
+{% block content %}
     <link rel="stylesheet" type="text/css" href="{% static 'users/basestyle.css' %}">
     <h1>Welcome, {{user.username}}</h1>
     <a href="{%url 'APILibraryApp:index' %}">Go to Index</a>
@@ -11,6 +9,4 @@
     <ul>
       seekrit info
     </ul>
-  </body>
 {% endblock %}
-</html>

@@ -1,8 +1,6 @@
 {% extends "APILibraryApp/navigator.html" %}
-<html>
 {% load static %}
-{% block register_content %}
-  <body>
+{% block content %}
     <link rel="stylesheet" type="text/css" href="{% static 'users/basestyle.css' %}">
     <h1>Register</h1>
     <form action="{% url 'users:register_user' %}" method="post">
@@ -21,6 +19,4 @@
       <input type="password" name="password" placeholder="password"/>
       <button type="submit">Login</button>
     </form>
-  </body>
 {% endblock %}
-</html>

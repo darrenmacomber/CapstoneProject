@@ -17,6 +17,8 @@ body {
   background-color: white;
   font-family: 'Comfortaa';
   margin: 5%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .navigator_bar {
