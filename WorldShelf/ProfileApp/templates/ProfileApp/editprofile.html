@@ -1,0 +1,75 @@
+{% extends "APILibraryApp/navigator.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
+<div id="ProfileFill">
+  <div class="title">
+    <h2>Edit Profile</h2>
+  </div>
+  <h3>{{user.username}}</h3>
+  <div>Name</div>
+  <span class="data_field" id="profile_info">
+    <input class="input_profile" id="name1" placeholder="First" v-model="first_name"/>
+  </span>
+  <span class="data_field" id="profile_info">
+    <input class="input_profile" id="name2" placeholder="Last" v-model="last_name"/>
+  </span>
+  <div>Birthday</div>
+  <div class="data_field" id="profile_info">
+    <input class="input_profile" id="birthday" type="date" v-model="birthday"/>
+  </div>
+  <div>Location</div>
+  <div class="data_field" id="profile_info">
+    <input class="input_profile" id="location" v-model="location"/>
+  </div>
+  <div>Describe Yourself!</div>
+  <div class="data_field" id="profile_info">
+    <textarea rows="5" cols="60" name="description" v-model="description">
+    </textarea><br>
+  </div>
+  <div class="button" id="submit_button">
+    <button v-on:click="saveProfile">Submit</button>
+  </div>
+</div>
+<script type="text/javascript">
+  let ProfileFill = new Vue({
+    el: '#ProfileFill',
+    delimiters: ["[[", "]]"],
+    data: {
+      first_name: "First Name",
+      last_name: "Last Name",
+      birthday: "mm / dd / yyyy",
+      location: "Location",
+      description: "Enter details here.",
+      items: [],
+    },
+    
+    methods: {
+      saveProfile: function(item) {
+        let app = this
+        let data = {
+          'username': "{{ user.username }}",
+          'first_name': this.first_name,
+          'last_name': this.last_name,
+          'birthday': this.birthday,
+          'location': this.location,
+          'description': this.description,
+        }
+        let config = {
+          headers: {
+            'X-CSRFToken': '{{csrf_token}}'
+          }
+        }
+        axios.post("{% url 'ProfileApp:updateProfile' %}", data, config).then(function(response) {
+          console.log(response.data)
+          if (response.data == 'success') {
+            alert('Profile Updated.')
+          } else {
+            alert('Error.')
+          }
+        })
+      }
+    }
+  })
+</script>
+{% endblock %}

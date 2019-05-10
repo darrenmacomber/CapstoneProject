@@ -60,6 +60,7 @@
           resultsPerPage: 10,
           page: 1,
         },
+
         methods: {
           pageForward: function() {
             this.page += 1
@@ -148,6 +149,7 @@
               }
             })
           },
+          
           saveThis: function(item) {
             let app = this
             let data = {
@@ -170,8 +172,6 @@
               }
             }
             axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(function(response) {
-              console.log(response.data)
-
               if (response.data == 'failure') {
                 alert('Please log in.')
               } else if (response.data == 'already added') {

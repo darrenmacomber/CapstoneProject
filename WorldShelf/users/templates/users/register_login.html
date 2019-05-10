@@ -2,21 +2,50 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" type="text/css" href="{% static 'users/basestyle.css' %}">
-    <h1>Register</h1>
-    <form action="{% url 'users:register_user' %}" method="post">
-      {% csrf_token %}
-      <input type="text" name="username" placeholder="username"/>
-      <input type="text" name="email" placeholder="email address"/>
-      <input type="password" name="password" placeholder="password"/>
-      <button type="submit">Register</button>
-    </form>
-
-
     <h1>Login</h1>
     <form action="{% url 'users:login_user' %}" method="post">
       {% csrf_token %}
       <input type="text" name="username" placeholder="username"/>
-      <input type="password" name="password" placeholder="password"/>
+      <input type="location" name="password" placeholder="password"/>
       <button type="submit">Login</button>
     </form>
+    <hr/>
+    <h1>Register</h1>
+    <form action="{% url 'users:register_user' %}" method="post">
+      {% csrf_token %}
+      User Name
+      <div class="data_field" id="profile_info">
+        <input type="text" name="username" placeholder="username"/>
+      </div>
+      Name
+      <div class="data_field" id="profile_info">
+        <input type="text" name="first_name" placeholder="first name"/>
+      </div>
+      <div class="data_field" id="profile_info">
+        <input type="text" name="last_name" placeholder="last name"/>
+      </div>
+      Email
+      <div class="data_field" id="profile_info">
+        <input type="text" name="email" placeholder="email address"/>
+      </div>
+      Birthday
+      <div class="data_field" id="profile_info">
+        <input type="date" name="birthday" placeholder="birthday"/>
+      </div>
+      Location
+      <div class="data_field" id="profile_info">
+        <input type="text" name="location" placeholder="location"/>
+      </div>
+      Description
+      <div class="data_field" id="profile_info">
+        <textarea rows="5" cols="60" name="description" v-model="description">
+        </textarea><br>
+      </div>
+      Password
+      <div class="data_field" id="profile_info">
+        <input type="password" name="password" placeholder="password"/>
+      </div>
+      <button type="submit">Register</button>
+    </form>
+
 {% endblock %}

@@ -1,0 +1,167 @@
+{% extends "APILibraryApp/navigator.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
+<div id="Profile">
+  <div class="title">
+    <h2>{{ profile.username }}</h2>
+  </div>
+  <div class="data_field" id="profile_info">
+    Name:
+    <span>{{profile.first_name}} {{profile.last_name}}</span>
+  </div>
+  <div class="data_field" id="profile_info">
+    Birthday:
+    <span>{{profile.prettybirthday}}</span>
+  </div>
+  <div class="data_field" id="profile_info">
+    Location:
+    <span>{{profile.location}}</span>
+  </div>
+  <div class="data_field" id="profile_info">
+    Description:
+    <div>{{profile.description}}</div>
+  </div>
+</div>
+<div class="container" id="MyShelf">
+  <div class="title">{{ profile.username }}'s Bookshelf</div>
+    <div class="data_field" id="book_data">
+      <div class="container" id="book_entry" v-for="item in items">
+        <div class="image"><img v-bind:src="item.thumbnail"/></div>
+        <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
+        <div class="entry_field"><a>Title: [[ item.title ]]</a></div>
+        <div class="entry_field"><a>Author: <span v-for="author in item.authors">[[ author ]] </span></a></div>
+        <div class="entry_field"><a>Languages: [[ item.languages ]]</a></div>
+        <div class="entry_field"><a>Pages: [[ item.page_count ]]</a></div>
+        <div class="entry_field"><a>Published: [[ item.publish_date ]]</a></div>
+        <div class="entry_field"><a>Publisher: [[ item.publisher ]]</a></div>
+        <div class="entry_field"><a>ISBN: <span v-for="isbn in item.isbn_array">[[ isbn.identifier ]] </span></a></div>
+        <div class="entry_field"><a>Ebook: [[ item.is_ebook ]]</a></div>
+        <div class="entry_field"><a>Categories: <span v-for="tag in item.category_tags">[[ tag ]]</span></a></div>
+        <div class="entry_field"><a>User Tags: <span v-for="tag in item.user_tags">[[ tag ]]</span></a></div>
+        <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
+        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
+      </div>
+    </div>
+</div>
+<script type="text/javascript">
+  let MyShelf = new Vue({
+    el: '#MyShelf',
+    delimiters: ['[[', ']]'],
+    data: {
+      book_ids: [
+      {% for book in user.books.all %}
+        "{{book.bookID}}",
+      {% endfor %}
+      ],
+      items: [],
+      resultsPerPage: 10,
+      page: 1,
+    },
+    
+    methods: {
+      pageForward: function() {
+        this.page += 1
+        for (let i=0; i<this.book_ids.length; i++) {
+          this.lookup(this.book_ids[i])
+        }
+      },
+
+      pageBack: function() {
+        if (this.page > 1) {
+          this.page -= 1
+        }
+        for (let i=0; i<this.book_ids.length; i++) {
+          this.lookup(this.book_ids[i])
+        }
+      },
+
+      resetLookup: function() {
+        this.page = 1
+        for (let i=0; i<this.book_ids.length; i++) {
+          this.lookup(this.book_ids[i])
+        }
+      },
+
+      checkValue: function(value) {
+        if (!value) {
+          return ''
+        }
+        return value
+      },
+
+    lookup: function (volume_id) {
+      let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
+      let startIndex = (this.page - 1)*this.resultsPerPage
+      let maxResults = this.resultsPerPage
+      let config = {
+        params: {
+          startIndex: startIndex,
+          maxResults: maxResults,
+          key: "{{ key }}"
+        }
+      }
+      axios.get(url, config).then(response => {
+        let data = response.data
+        console.log(response)
+        this.startIndex = response.data.startIndex
+        let bookID = data.id
+        let title = data.volumeInfo.title
+        let authors = data.volumeInfo.authors
+        let languages = data.volumeInfo.language
+        let page_count = data.volumeInfo.pageCount
+        if (!page_count)
+          page_count = 0
+        let publish_date = data.volumeInfo.publishedDate
+        publish_date = this.checkValue(publish_date)
+        let publisher = data.volumeInfo.publisher
+        publisher = this.checkValue(publisher)
+        let isbn_array = []
+        if (data.volumeInfo.industryIdentifiers)
+          isbn_array = data.volumeInfo.industryIdentifiers
+        let ebook = data.saleInfo.isEbook
+        let is_ebook = 'No'
+        if (ebook)
+          is_ebook = 'Yes'
+        let category_tags = []
+        if (data.volumeInfo.categories)
+          category_tags = data.volumeInfo.categories
+        let user_tags = data.user_tags
+        //usertag function goes here//
+        let description = data.volumeInfo.description
+        description = this.checkValue(description)
+        let thumbnail = ''
+        if (data.volumeInfo.imageLinks)
+          thumbnail = data.volumeInfo.imageLinks.thumbnail
+        this.items.push({
+            bookID: bookID,
+            title: title,
+            authors: authors,
+            languages: languages,
+            page_count: page_count,
+            publish_date: publish_date,
+            publisher: publisher,
+            isbn_array: isbn_array,
+            ebook: ebook,
+            is_ebook: is_ebook,
+            category_tags: category_tags,
+            user_tags: user_tags,
+            description: description,
+            thumbnail: thumbnail,
+          })
+          console.log(this.items)
+      }).catch(function(error) {
+        console.log(response)
+      })
+    }
+  },
+
+  created: function () {
+    console.log('active')
+    for (let i=0; i<this.book_ids.length; i++) {
+      this.lookup(this.book_ids[i])
+    }
+  },
+})
+</script>
+{% endblock %}

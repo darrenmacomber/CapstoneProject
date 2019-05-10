@@ -6,28 +6,36 @@
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     </head>
-    <header>
-      <div class="container" id="header_bar">
-        <div class="title">
-          <h1>WorldShelf: Your Personal Online Bookshelf</h1>
-        </div>
-        <div class="navigator_bar" id="index_bar">
-          <div class="container" id="index_button">
-            <span><a href="{% url 'ProfileApp:profile' %}">Profile</a></span>
-          </div>
-          <div class="container" id="index_button">
-            <span><a href="{% url 'APILibraryApp:index' %}">Search Books</a></span>
-          </div>
-          <div class="container" id="index_button">
-            <span><a>Search Tags</a></span>
-          </div>
-          <div class="container" id="index_button">
-            <span><a href="{% url 'users:register_login' %}">Register/Login</a></span>
-          </div>
-        </div>
-      </div>
-    </header>
     <body>
-    {% block content %}{% endblock %}
+      <header>
+        <div class="container" id="header_bar">
+          <div class="title">
+            <h1>WorldShelf: Your Personal Online Bookshelf</h1>
+          </div>
+          <div class="navigator_bar" id="index_bar">
+            {% if user.is_authenticated %}
+            <div class="container" id="index_button">
+              <span><a href="{% url 'ProfileApp:profile' user.username %}">Profile</a></span>
+            </div>
+            {% endif %}
+            <div class="container" id="index_button">
+              <span><a href="{% url 'APILibraryApp:index' %}">Search Books</a></span>
+            </div>
+            <div class="container" id="index_button">
+              <span><a>Search Tags</a></span>
+            </div>
+            <div class="container" id="index_button">
+              <span><a href="{% url 'ProfileApp:editprofile' %}">Edit Profile</a></span>
+            </div>
+            <div class="container" id="index_button">
+              <span><a href="{% url 'users:register_login' %}">Register/Login</a></span>
+            </div>
+            <div class="container" id="index_button">
+              <span><a href="{% url 'users:logout_user' %}">Logout</a></span>
+            </div>
+          </div>
+        </div>
+      </header>
+      {% block content %}{% endblock %}
     </body>
   </html>
