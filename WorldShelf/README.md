@@ -1,4 +1,4 @@
-# MediaShelf (placeholder)
+# WorldShelf
 
 ## Concept
 An app designed to accommodate group reading and watching of media. Similar to GoodReads, basic functionality will allow for making a personalized profile that keeps track of what books you read, where you are in them, and how much you liked them. You can post blog entries about your experiences with the work and others can search and find them by keywords for your blog or the books you read. Other accounts can discuss with you by commenting on your posts. You will be able to filter out comments and profiles regarding works you're reading by accounts that are recorded as being further in the work than you are, avoiding spoilers.
