@@ -3,6 +3,6 @@ from . import views
 
 app_name = 'APILibraryApp'
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('bookSearch', views.bookSearch, name='bookSearch'),
     path('saveBook', views.saveBook, name='saveBook'),
 ]

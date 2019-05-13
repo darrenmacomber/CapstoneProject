@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, reverse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.apps import apps
 from .models import UserProfile
 from django.contrib.auth.models import User
@@ -11,9 +11,27 @@ from APILibraryApp.views import saveBook
 
 import json, datetime
 
+def searchProfiles(request):
+    return render(request, 'ProfileApp/searchProfiles.html')
+
+def getUsers(request):
+    data = {'users': []}
+    user_array = User.objects.all()
+    for user in user_array:
+        username = user.username
+        profile = user.profile
+        data['users'].append({
+            'username': username,
+            'first_name': profile.first_name,
+            'last_name': profile.last_name,
+            'birthday': profile.birthday,
+            'location': profile.location,
+            'description': profile.description,
+        })
+    return JsonResponse(data)
+
 def updateProfile(request):
     data = json.loads(request.body)
-    print(data)
     username = request.user
     target_profile = UserProfile.objects.get(username=data['username'])
     target_profile.first_name = data['first_name']
@@ -24,7 +42,7 @@ def updateProfile(request):
     target_profile.save()
     return HttpResponse('success')
 
-def profile(request, username):
+def userProfile(request, username):
     target_profile = UserProfile.objects.get(username=username)
     context = {
         'profile': target_profile,
@@ -34,11 +52,11 @@ def profile(request, username):
         'birthday': target_profile.birthday,
         'location': target_profile.location,
         'description': target_profile.description,
-        'key': google_books_api_key
+        'key': google_books_api_key,
+        'profile_user': target_profile.user
     }
-    print(target_profile)
-    return render(request, 'ProfileApp/profile.html', context)
+    return render(request, 'ProfileApp/userProfile.html', context)
 
 @login_required
-def editprofile(request):
-    return render(request, 'ProfileApp/editprofile.html')
+def editProfile(request):
+    return render(request, 'ProfileApp/editProfile.html')

@@ -3,7 +3,10 @@ from . import views
 
 app_name = 'ProfileApp'
 urlpatterns = [
-    path('', views.editprofile, name='editprofile'),
+    path('getUsers/', views.getUsers, name='getUsers'),
+    path('edit/', views.editProfile, name='editProfile'),
     path('updateProfile/', views.updateProfile, name='updateProfile'),
-    path('<str:username>/', views.profile, name='profile')
+    path('userProfile/<str:username>/', views.userProfile, name='userProfile'),
+    path('saveBook/', views.saveBook, name='saveBook'),
+    path('searchProfiles/', views.searchProfiles, name='searchProfiles'),
 ]

@@ -2,27 +2,35 @@
 @import url('https://fonts.googleapis.com/css?family=Comfortaa');
 
 <style>
-.header_bar > *{
-  background-color: white;
-  font-family: 'Cormorant Garamond';
-}
 
-.title {
-  background-color: white;
+header {
+  background-color: #FAE8DD;
   font-family: 'Cormorant Garamond';
   font-size: 25px;
+  padding: 5px;
+  margin: 5px;
 }
 
 body {
-  background-color: white;
+  background-color: #d6c2b5;
   font-family: 'Comfortaa';
   margin: 5%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+.title {
+  background-color: #FAE8DD;
+  padding: 5px;
+  margin: 5px;
+}
+
+.header_bar {
+  background-color: #FAE8DD;
+}
+
 .navigator_bar {
-  background-color: white;
+  background-color: #FAE8DD;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -50,17 +58,21 @@ a:visited {
   font-size: 20px;
 }
 
-.data_field > * {
-  background-color: beige;
+.data_field {
+  background-color: #eddacd;
+}
+
+.data_field > *{
+  background-color: #FAE8DD;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
-  padding: 10px;
-  margin: 10px;
+  padding: 5px;
+  margin: 5px;
 }
 
-#book_entry > .entry_field {
+.entry_field {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;

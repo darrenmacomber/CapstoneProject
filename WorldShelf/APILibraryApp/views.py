@@ -4,8 +4,8 @@ from .models import Book, Author, Category, UserTag
 
 import json
 
-def index(request):
-    return render(request, 'APILibraryApp/index.html')
+def bookSearch(request):
+    return render(request, 'APILibraryApp/bookSearch.html')
 
 def saveBook(request):
     if not request.user.is_authenticated:
@@ -14,7 +14,14 @@ def saveBook(request):
     print(data)
     bookID = data['bookID']
     if Book.objects.filter(bookID = bookID).exists():
-        return HttpResponse('already added')
+        target_book = Book.objects.get(bookID = bookID)
+        if target_book.users.filter(username= request.user).exists():
+            print(request.user)
+            return HttpResponse('already added')
+        else:
+            target_book.users.add(request.user)
+            target_book.save()
+            return HttpResponse('success')
     title = data['title']
     languages = data['languages']
     page_count = data['page_count']

@@ -1,0 +1,57 @@
+{% extends "APILibraryApp/navigator.html" %}
+{% load static %}
+{% block content %}
+  <link rel="stylesheet" type="text/css" href="{% static 'ProfileApp/basestyle.css' %}">
+  <!--Links CSS Sheet in Static  -->
+  <div id="ProfileSearch">
+    <div class="title"><h3>Search Profiles</h3></div>
+    <div class="navigator_bar" id="search_bar">
+      <div class="container" id="navigator_input">
+        <input type="text" v-model="search_profiles" v-on:keydown.enter="lookup" placeholder="Enter search info here."></input>
+      </div>
+      <div class="button" id="search_button">
+        <button v-on:click="lookup">🔎</button>
+      </div>
+    </div>
+  <!-- Navigator bar flexbox containing search parameters -->
+  <div class="data_field" id="profile_data">
+    <div class="container" id="profile_entry" v-for="item in items">
+      <div class="entry_field"><a v-bind:href="'/profile/userProfile/'+item.username">[[ item.username ]]</a></div>
+      <div class="entry_field"><a>[[ item.birthday ]]</a></div>
+      <div class="entry_field"><a>[[ item.location ]]</a></div>
+      <div><hr/></div>
+    </div>
+  </div>
+</div>
+  <script type="text/javascript">
+    let ProfileSearch = new Vue({
+      el: '#ProfileSearch',
+      delimiters: ['[[', ']]'],
+      data: {
+        search_profiles: '',
+        items: [],
+      },
+
+      methods: {
+        lookup: function() {
+          let app = this
+          axios.get("{% url "ProfileApp:getUsers" %}").then(function(response) {
+            let data = response.data
+            app.items = []
+            for (let i=0; i<data.users.length; ++i) {
+              let username = data.users[i].username
+              let birthday = data.users[i].birthday
+              let location = data.users[i].location
+              app.items.push({
+                username: username,
+                birthday: birthday,
+                location: location,
+              })
+            }
+            console.log(app.objects.all())
+          })
+        },
+      },
+    })
+  </script>
+{% endblock %}

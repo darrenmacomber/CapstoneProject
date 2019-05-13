@@ -2,30 +2,28 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
-<div id="Profile">
-  <div class="title">
-    <h2>{{ profile.username }}</h2>
+<div class="data_field" id="Profile">
+  <div class="title"><h2>{{ profile.username }}</h2></div>
+  <div class="entry_field" id="profile_info">
+    Name:<br>
+    <span> {{profile.first_name}} {{profile.last_name}}</span>
   </div>
-  <div class="data_field" id="profile_info">
-    Name:
-    <span>{{profile.first_name}} {{profile.last_name}}</span>
+  <div class="entry_field" id="profile_info">
+    Birthday:<br>
+    <span> {{profile.prettybirthday}}</span>
   </div>
-  <div class="data_field" id="profile_info">
-    Birthday:
-    <span>{{profile.prettybirthday}}</span>
+  <div class="entry_field" id="profile_info">
+    Location:<br>
+    <span> {{profile.location}}</span>
   </div>
-  <div class="data_field" id="profile_info">
-    Location:
-    <span>{{profile.location}}</span>
-  </div>
-  <div class="data_field" id="profile_info">
-    Description:
-    <div>{{profile.description}}</div>
+  <div class="entry_field" id="profile_info">
+    Description:<br>
+    <div> {{profile.description}}</div>
   </div>
 </div>
 <div class="container" id="MyShelf">
-  <div class="title">{{ profile.username }}'s Bookshelf</div>
     <div class="data_field" id="book_data">
+      <div class="title"><h2>{{ profile.username }}'s Bookshelf</h2></div>
       <div class="container" id="book_entry" v-for="item in items">
         <div class="image"><img v-bind:src="item.thumbnail"/></div>
         <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
@@ -41,6 +39,7 @@
         <div class="entry_field"><a>User Tags: <span v-for="tag in item.user_tags">[[ tag ]]</span></a></div>
         <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
         <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
+        <div><hr/></div>
       </div>
     </div>
 </div>
@@ -50,7 +49,7 @@
     delimiters: ['[[', ']]'],
     data: {
       book_ids: [
-      {% for book in user.books.all %}
+      {% for book in profile_user.books.all %}
         "{{book.bookID}}",
       {% endfor %}
       ],
@@ -58,7 +57,7 @@
       resultsPerPage: 10,
       page: 1,
     },
-    
+
     methods: {
       pageForward: function() {
         this.page += 1
@@ -150,12 +149,41 @@
             thumbnail: thumbnail,
           })
           console.log(this.items)
-      }).catch(function(error) {
-        console.log(response)
       })
-    }
-  },
+    },
 
+  saveThis: function(item) {
+    let app = this
+    let data = {
+      'bookID': item.bookID,
+      'title': item.title,
+      'authors': item.authors,
+      'languages': item.languages,
+      'page_count': item.page_count,
+      'publish_date': item.publish_date,
+      'publisher': item.publisher,
+      'isbn': item.isbn_array.map(x => x.identifier).join(', '),
+      'ebook': item.ebook,
+      'category_tags': item.category_tags,
+      'description': item.description,
+      'thumbnail': item.thumbnail,
+    }
+    let config = {
+      headers: {
+        'X-CSRFToken': '{{csrf_token}}'
+      }
+    }
+    axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(function(response) {
+      if (response.data == 'failure') {
+        alert('Please log in.')
+      } else if (response.data == 'already added') {
+        alert('Already added.')
+      } else {
+        alert('Successfully added.')
+      }
+    })
+  }
+},
   created: function () {
     console.log('active')
     for (let i=0; i<this.book_ids.length; i++) {
