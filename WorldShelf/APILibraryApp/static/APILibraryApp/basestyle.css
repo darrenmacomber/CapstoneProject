@@ -86,6 +86,7 @@ a:visited {
 }
 
 #add_button {
+  cursor: pointer;
   background-color: white;
   border-radius: 10px;
   font-family: 'Comfortaa';

@@ -7,9 +7,12 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from .secrets import google_books_api_key
 from APILibraryApp.models import Book, Author, Category, UserTag
-from APILibraryApp.views import saveBook
+from APILibraryApp.views import saveBook, getTags, saveTags
 
 import json, datetime
+
+def index(request):
+    return HttpResponse('ok')
 
 def searchProfiles(request):
     return render(request, 'ProfileApp/searchProfiles.html')
@@ -25,6 +28,7 @@ def getUsers(request):
             'first_name': profile.first_name,
             'last_name': profile.last_name,
             'birthday': profile.birthday,
+            'prettybirthday': profile.prettybirthday(),
             'location': profile.location,
             'description': profile.description,
         })
@@ -50,6 +54,7 @@ def userProfile(request, username):
         'first_name': target_profile.first_name,
         'last_name': target_profile.last_name,
         'birthday': target_profile.birthday,
+        'prettybirthday': target_profile.prettybirthday(),
         'location': target_profile.location,
         'description': target_profile.description,
         'key': google_books_api_key,

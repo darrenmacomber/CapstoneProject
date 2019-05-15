@@ -18,7 +18,7 @@
       </div>
       <div class="container" id="navigator_input">
         <span>Results Per Page</span>
-        <select v-model="resultsPerPage">
+        <select id="result_select" v-model="resultsPerPage">
           <option>5</option>
           <option>10</option>
           <option>20</option>
@@ -123,7 +123,7 @@
               if (data.items[i].volumeInfo.categories)
                 category_tags = data.items[i].volumeInfo.categories
               let user_tags = data.user_tags
-              //usertag function goes here//
+                //usertag function goes here//
               let description = data.items[i].volumeInfo.description
               description = this.checkValue(description)
               let thumbnail = ''
