@@ -73,14 +73,14 @@ Using an API that has publishing info to fill book data. (Author, publishing dat
   - [x] Link in API
   - [x] Search API Function
   - [x] Set up Book View
-  - [ ] Let user save Books to Profile and create ProfileBook Model
+  - [x] Let user save Books to Profile and create ProfileBook Model
   - [x] Templates
 ### Milestone 2 Goals
-  - [ ] User Profile Template
-  - [ ] User Tag Model
-  - [ ] User Search Index
+  - [x] User Profile Template
+  - [x] User Tag Model
+  - [x] User Search Index
   - [ ] Add Tag View
-  - [ ] Templates
+  - [x] Templates
 ### Milestone 3 Goals
   - [ ] Filtering tags and users
   - [ ] Following profiles
