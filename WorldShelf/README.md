@@ -79,7 +79,7 @@ Using an API that has publishing info to fill book data. (Author, publishing dat
   - [x] User Profile Template
   - [x] User Tag Model
   - [x] User Search Index
-  - [ ] Add Tag View
+  - [x] Add Tag View
   - [x] Templates
 ### Milestone 3 Goals
   - [ ] Filtering tags and users

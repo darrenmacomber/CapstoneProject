@@ -21,7 +21,6 @@ def saveBook(request):
     if Book.objects.filter(bookID = bookID).exists():
         target_book = Book.objects.get(bookID = bookID)
         if target_book.users.filter(username= request.user).exists():
-            print(request.user)
             return HttpResponse('already added')
         else:
             target_book.users.add(request.user)
@@ -40,13 +39,10 @@ def saveBook(request):
     book.save()
     book.users.add(request.user)
     author_array = data['authors']
-    print(author_array)
     for author in author_array:
-        print(author)
         author, created = Author.objects.get_or_create(name=author)
         book.authors.add(author)
     category_array = data['category_tags']
-    print(category_array)
     for category in category_array:
         category, created = Category.objects.get_or_create(name=category)
         book.category_tags.add(category)
@@ -56,12 +52,10 @@ def removeBook(request):
     if not request.user.is_authenticated:
         return HttpResponse('failure')
     data = json.loads(request.body)
-    print(data)
     bookID = data['bookID']
     if Book.objects.filter(bookID = bookID).exists():
         target_book = Book.objects.get(bookID = bookID)
         if target_book.users.filter(username= request.user).exists():
-            print(request.user)
             return HttpResponse('already added')
         else:
             target_book.users.add(request.user)
@@ -78,16 +72,36 @@ def getTags(request):
         })
     return JsonResponse(data)
 
+def findTaggedBooks(request):
+    print(request)
+    indata = json.loads(request.body)
+    target_tag = indata['target_tag']
+    data = {'bookIDs': []}
+    book_array = Book.objects.all()
+    for book in book_array:
+        for tag in book.user_tags.all():
+            if tag.name == target_tag:
+                data['bookIDs'].append({
+                    'bookID': book.bookID
+                })
+    return JsonResponse(data)
+
+def bookTags(request):
+    bookID = request.GET['bookID']
+    data = {'UserTag': []}
+    if Book.objects.filter(bookID = bookID).exists():
+        target_book = Book.objects.get(bookID = bookID)
+        for tag in target_book.user_tags.all():
+            data['UserTag'].append(tag.name)
+    return JsonResponse(data)
+
 def saveTags(request):
     if not request.user.is_authenticated:
         return HttpResponse('failure')
     data = json.loads(request.body)
     bookID = data['bookID']
-    print(bookID)
     name = data['tag']
-    print(name)
     target_tag = UserTag.objects.get(name=name)
-    print(target_tag)
     if Book.objects.filter(bookID = bookID).exists():
         target_book = Book.objects.get(bookID = bookID)
         if target_book.user_tags.filter(name=name).exists():

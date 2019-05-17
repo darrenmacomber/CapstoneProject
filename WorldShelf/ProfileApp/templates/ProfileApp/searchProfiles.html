@@ -26,8 +26,6 @@
   <script type="text/javascript">
 
     function contains(text, query) {
-      console.log(text)
-      console.log(query)
       return text.toLowerCase().indexOf(query.toLowerCase()) != -1
     }
 
@@ -43,7 +41,6 @@
         lookup: function() {
           axios.get("{% url 'ProfileApp:getUsers' %}").then(response => {
             let data = response.data
-            console.log(data)
             this.items = []
             for (let i=0; i<data.users.length; ++i) {
               let username = data.users[i].username

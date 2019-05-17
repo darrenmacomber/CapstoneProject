@@ -1,29 +1,51 @@
 {% extends "APILibraryApp/navigator.html" %}
 {% load static %}
 {% block content %}
+  <!--Links CSS Sheet in Static  -->
   <link rel="stylesheet" type="text/css" href="{% static 'ProfileApp/basestyle.css' %}">
+  <!-- Search UserTag objects by name field -->
   <div id="TagSearch">
     <div class="title"><h3>Search Tags</h3></div>
     <div class="navigator_bar" id="search_bar">
       <div class="container" id="navigator_input">
-        <input type="text" v-model="search_tags" v-on:keydown.enter="lookup" placeholder="Enter search info here."/>
+        <input type="text" v-model="search_tags" v-on:keydown.enter="tagLookup" placeholder="Enter search info here."/>
       </div>
       <div class="button" id="search_button">
-        <button v-on:click="lookup">🔎</button>
+        <button v-on:click="tagLookup">🔎</button>
       </div>
     </div>
-  <!-- Navigator bar flexbox containing search parameters -->
+  <!-- Display tag search results; searches extant Book objects for tag on click -->
     <div class="data_field" id="tag_data">
-      <div class="container" id="tag_entry" v-for="item in items">
+      <div class="container" id="tag_entry" v-for="tagbutton in tagbuttons">
+        <div class="entry_field"><a v-on:click="findTaggedBooks(tagbutton.name)">[[ tagbutton.name ]]</a></div>
+      </div>
+    </div>
+    <div class="data_field" id="book_data">
+      <div class="container" id="book_entry" v-for="item in items">
+        <div class="image"><img v-bind:src="item.thumbnail"/></div>
+        <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
+        <div class="entry_field"><a>Title: [[ item.title ]]</a></div>
+        <div class="entry_field"><a>Author: <span v-for="(author, index) in item.authors"> [[ author ]]<span v-if="index+1 < item.authors.length"> / </span></span></a></div>
+        <div class="entry_field"><a>Languages: [[ item.languages ]]</a></div>
+        <div class="entry_field"><a>Pages: [[ item.page_count ]]</a></div>
+        <div class="entry_field"><a>Published: [[ item.publish_date ]]</a></div>
+        <div class="entry_field"><a>Publisher: [[ item.publisher ]]</a></div>
+        <div class="entry_field"><a>ISBN: <span v-for="(isbn, index) in item.isbn_array">[[ isbn.identifier ]]<span v-if="index+1 < item.isbn_array.length"> / </span></span></a></div>
+        <div class="entry_field"><a>Ebook: [[ item.is_ebook ]]</a></div>
+        <div class="entry_field"><a>Categories: <span v-for="tag in item.category_tags"> [[ tag ]] </span></a></div>
+        <div class="entry_field"><a>User Tags: <span v-for="(tag, index) in item.user_tags">[[ tag ]]<span v-if="index+1 < item.user_tags.length"> / </span></span></a></div>
+        <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
+        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
         <div><hr/></div>
       </div>
     </div>
   </div>
+
+
+  <!-- Data container displaying information on books drawn from API and UserTag/Book tables -->
   <script type="text/javascript">
 
     function contains(text, query) {
-      console.log(text)
-      console.log(query)
       return text.toLowerCase().indexOf(query.toLowerCase()) != -1
     }
 
@@ -32,29 +54,177 @@
       delimiters: ['[[', ']]'],
       data: {
         search_tags: '',
+        target_tag: '',
+        tagbuttons: [],
+        tagged_books: [],
         items: [],
+        resultsPerPage:10,
+        page: 1,
       },
 
       methods: {
-        lookup: function() {
-          axios.get("{% url 'ProfileApp:getUsers' %}").then(response => {
+        checkValue: function(value) {
+          if (!value) {
+            return ''
+          }
+          return value
+        },
+
+        tagLookup: function() {
+          axios.get("{% url 'APILibraryApp:getTags' %}").then(response => {
             let data = response.data
-            console.log(data)
-            this.items = []
-            for (let i=0; i<data.users.length; ++i) {
-              let username = data.users[i].username
-              let birthday = data.users[i].birthday
-              let prettybirthday = data.users[i].prettybirthday
-              let location = data.users[i].location
-              if (contains(username, this.search_tags)
-                  || contains(location, this.search_tags)) {
-                this.items.push({
-                  username: username,
-                  birthday: birthday,
-                  prettybirthday: prettybirthday,
-                  location: location,
+            this.tagbuttons = []
+            for (let i=0; i<data.tags.length; ++i) {
+              let name = data.tags[i].name
+              if (contains(name, this.search_tags)) {
+                this.tagbuttons.push({
+                  name: name,
                 })
               }
+            }
+          })
+        },
+
+        findTaggedBooks: function(target_tag) {
+          let data = {
+            'target_tag': target_tag
+          }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}'
+            }
+          }
+          axios.post("{% url 'APILibraryApp:findTaggedBooks' %}", data, config).then(response => {
+            this.tagged_books = []
+            let data = response.data
+            let bookIDs = data.bookIDs
+            for (i=0; i<bookIDs.length; ++i) {
+              target_id = bookIDs[i].bookID
+              this.tagged_books.push(target_id)
+            }
+            for (tag in this.tagged_books) {
+              target_tag = this.tagged_books[tag]
+              this.bookLookup(target_tag)
+            }
+          })
+        },
+
+        getBookTags: function(item) {
+          axios.get("{% url 'APILibraryApp:bookTags' %}?bookID=" + item.bookID).then(response => {
+            let tagdata = response.data
+            item.user_tags = tagdata.UserTag
+          })
+        },
+
+        bookLookup: function(volume_id) {
+          let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
+          let startIndex = (this.page - 1)*this.resultsPerPage
+          let maxResults = this.resultsPerPage
+          let config = {
+            params: {
+              startIndex: startIndex,
+              maxResults: maxResults,
+            }
+          }
+          axios.get(url, config).then(response => {
+            console.log(response)
+            let data = response.data
+            this.startIndex = response.data.startIndex
+            let bookID = data.id
+            let title = data.volumeInfo.title
+            let authors = data.volumeInfo.authors
+            let languages = data.volumeInfo.language
+            let page_count = data.volumeInfo.pageCount
+            if (!page_count)
+              page_count = 0
+            let publish_date = data.volumeInfo.publishedDate
+            publish_date = this.checkValue(publish_date)
+            let publisher = data.volumeInfo.publisher
+            publisher = this.checkValue(publisher)
+            let isbn_array = []
+            if (data.volumeInfo.industryIdentifiers)
+              isbn_array = data.volumeInfo.industryIdentifiers
+            let ebook = data.saleInfo.isEbook
+            let is_ebook = 'No'
+            if (ebook)
+              is_ebook = 'Yes'
+            let category_tags = []
+            if (data.volumeInfo.categories)
+              category_tags = data.volumeInfo.categories
+            let description = data.volumeInfo.description
+            description = this.checkValue(description)
+            let thumbnail = ''
+            if (data.volumeInfo.imageLinks)
+              thumbnail = data.volumeInfo.imageLinks.thumbnail
+            item = {
+                bookID: bookID,
+                title: title,
+                authors: authors,
+                languages: languages,
+                page_count: page_count,
+                publish_date: publish_date,
+                publisher: publisher,
+                isbn_array: isbn_array,
+                ebook: ebook,
+                is_ebook: is_ebook,
+                category_tags: category_tags,
+                user_tags: [],
+                description: description,
+                thumbnail: thumbnail,
+              }
+              this.getBookTags(item)
+              this.items.push(item)
+          })
+        },
+
+        saveThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+            'title': item.title,
+            'authors': item.authors,
+            'languages': item.languages,
+            'page_count': item.page_count,
+            'publish_date': item.publish_date,
+            'publisher': item.publisher,
+            'isbn': item.isbn_array.map(x => x.identifier).join(', '),
+            'ebook': item.ebook,
+            'category_tags': item.category_tags,
+            'description': item.description,
+            'thumbnail': item.thumbnail,
+          }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}'
+            }
+          }
+          axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(response => {
+            if (response.data == 'failure') {
+              alert('Please log in.')
+            } else if (response.data == 'already added') {
+              alert('Already added.')
+            } else {
+              alert('Successfully added.')
+            }
+          })
+        },
+
+        tagThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+            'tag': this.select_tag
+          }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}'
+            },
+          }
+          axios.post("{% url 'APILibraryApp:saveTags' %}", data, config).then(response => {
+            if (response.data == 'failure') {
+              alert('Please log in.')
+            } else if (response.data == 'already added') {
+              alert('Already added.')
+            } else {
+              alert('Successfully added')
             }
           })
         },

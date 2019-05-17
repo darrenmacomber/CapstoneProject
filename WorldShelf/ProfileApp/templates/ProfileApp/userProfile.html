@@ -87,6 +87,13 @@
         })
       },
 
+      getBookTags: function(item) {
+        axios.get("{% url 'APILibraryApp:bookTags' %}?bookID=" + item.bookID).then(response => {
+          let tagdata = response.data
+          item.user_tags = tagdata.UserTag
+        })
+      },
+
       lookup: function(volume_id) {
         let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
         let startIndex = (this.page - 1)*this.resultsPerPage
@@ -95,10 +102,8 @@
           params: {
             startIndex: startIndex,
             maxResults: maxResults,
-            // key: "{{ key }}"
           }
         }
-        console.log(url)
         axios.get(url, config).then(response => {
           let data = response.data
           this.startIndex = response.data.startIndex
@@ -123,14 +128,12 @@
           let category_tags = []
           if (data.volumeInfo.categories)
             category_tags = data.volumeInfo.categories
-          let user_tags = data.user_tags
-          //usertag function goes here//
           let description = data.volumeInfo.description
           description = this.checkValue(description)
           let thumbnail = ''
           if (data.volumeInfo.imageLinks)
             thumbnail = data.volumeInfo.imageLinks.thumbnail
-          this.items.push({
+          item = {
               bookID: bookID,
               title: title,
               authors: authors,
@@ -142,10 +145,12 @@
               ebook: ebook,
               is_ebook: is_ebook,
               category_tags: category_tags,
-              user_tags: user_tags,
+              user_tags: [],
               description: description,
               thumbnail: thumbnail,
-            })
+            }
+            this.getBookTags(item)
+            this.items.push(item)
         })
       },
 
@@ -203,7 +208,6 @@
     },
 
   created: function() {
-    console.log('active')
     for (let i=0; i<this.book_ids.length; i++) {
       this.lookup(this.book_ids[i])
     }

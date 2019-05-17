@@ -9,4 +9,6 @@ urlpatterns = [
     path('tagSearch/', views.tagSearch, name='tagSearch'),
     path('getTags/', views.getTags, name='getTags'),
     path('saveTags/', views.saveTags, name='saveTags'),
+    path('bookTags/', views.bookTags, name='bookTags'),
+    path('findTaggedBooks/', views.findTaggedBooks, name='findTaggedBooks'),
 ]
