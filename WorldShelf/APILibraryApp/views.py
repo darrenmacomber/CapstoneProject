@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import Book, Author, Category, UserTag
+from .models import Book, Author, Category, UserTag, UserBook
 
 import json
 
@@ -20,11 +20,12 @@ def saveBook(request):
     bookID = data['bookID']
     if Book.objects.filter(bookID = bookID).exists():
         target_book = Book.objects.get(bookID = bookID)
-        if target_book.users.filter(username= request.user).exists():
+        if target_book.userbooks.filter(user = request.user).exists():
             return HttpResponse('already added')
         else:
-            target_book.users.add(request.user)
-            target_book.save()
+            user = request.user
+            userbook = UserBook(user=user, book=book, progress=0, impressions='')
+            userbook.save()
             return HttpResponse('success')
     title = data['title']
     languages = data['languages']
@@ -37,7 +38,6 @@ def saveBook(request):
     thumbnail = data['thumbnail']
     book = Book(bookID=bookID, title=title, languages=languages, page_count=page_count, publish_date=publish_date, publisher=publisher, isbn=isbn, ebook=ebook, description=description, thumbnail=thumbnail)
     book.save()
-    book.users.add(request.user)
     author_array = data['authors']
     for author in author_array:
         author, created = Author.objects.get_or_create(name=author)
@@ -46,6 +46,9 @@ def saveBook(request):
     for category in category_array:
         category, created = Category.objects.get_or_create(name=category)
         book.category_tags.add(category)
+    user = request.user
+    userbook = UserBook(user=user, book=book, progress=0, impressions='')
+    userbook.save()
     return HttpResponse('success')
 
 def removeBook(request):
@@ -62,6 +65,24 @@ def removeBook(request):
             target_book.save()
             return HttpResponse('success')
 
+def getUserBooks(request):
+    indata = json.loads(request.body)
+    target_user = indata['user']
+    userbooks = UserBook.objects.all()
+    data = {'userbooks': []}
+    for userbook in userbooks:
+        id = userbook.id
+        book = userbook.book.bookID
+        user = userbook.user.username
+        progress = userbook.progress
+        if user == target_user:
+            data['userbooks'].append({
+                'id': id,
+                'book': book,
+                'progress': progress,
+                })
+    return JsonResponse(data)
+
 def getTags(request):
     data = {'tags': []}
     tag_array = UserTag.objects.all()
@@ -73,7 +94,6 @@ def getTags(request):
     return JsonResponse(data)
 
 def findTaggedBooks(request):
-    print(request)
     indata = json.loads(request.body)
     target_tag = indata['target_tag']
     data = {'bookIDs': []}

@@ -54,11 +54,7 @@
     el: '#MyShelf',
     delimiters: ['[[', ']]'],
     data: {
-      book_ids: [
-      {% for book in profile_user.books.all %}
-        "{{book.bookID}}",
-      {% endfor %}
-      ],
+      userbooks: [],
       select_tag: '',
       items: [],
       tags: [],
@@ -107,6 +103,7 @@
         axios.get(url, config).then(response => {
           let data = response.data
           this.startIndex = response.data.startIndex
+          // insert spoiler protection function here
           let bookID = data.id
           let title = data.volumeInfo.title
           let authors = data.volumeInfo.authors
@@ -205,12 +202,39 @@
           }
         })
       },
+
+      getUserBooks: function() {
+        let data = {
+          user: "{{profile_user.username}}"
+        }
+        let config = {
+          headers: {
+            'X-CSRFToken': '{{csrf_token}}'
+          }
+        }
+        axios.post("{% url 'APILibraryApp:getUserBooks' %}", data, config).then(response => {
+          let data = response.data
+          for (let i=0; i<data.userbooks.length; ++i) {
+            let id = data.userbooks[i].id
+            let bookID = data.userbooks[i].book
+            let progress = 0
+            progress += data.userbooks[i].progress
+            userbook = {
+              'id': id,
+              'bookID': bookID,
+              'progress': progress,
+            }
+            this.userbooks.push(userbook)
+          }
+          for (let i=0; i<this.userbooks.length; i++) {
+            this.lookup(this.userbooks[i].bookID)
+          }
+        })
+      },
     },
 
   created: function() {
-    for (let i=0; i<this.book_ids.length; i++) {
-      this.lookup(this.book_ids[i])
-    }
+    this.getUserBooks()
     this.tagGen()
   },
 })

@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from .secrets import google_books_api_key
-from APILibraryApp.models import Book, Author, Category, UserTag
-from APILibraryApp.views import saveBook, getTags, saveTags
+from APILibraryApp.models import Book, Author, Category, UserTag, UserBook
+from APILibraryApp.views import saveBook, getTags, saveTags, getUserBooks
 
 import json, datetime
 
