@@ -82,7 +82,7 @@ Using an API that has publishing info to fill book data. (Author, publishing dat
   - [x] Add Tag View
   - [x] Templates
 ### Milestone 3 Goals
-  - [ ] Filtering tags and users
-  - [ ] Following profiles
-  - [ ] Schedule, Calender
+  - [x] Spoiler Protection
+  - [x] Comments on Profiles
+  - [x] Progress Tracking and Hide Potential Spoiler Comments
   - [ ] Try for TV shows

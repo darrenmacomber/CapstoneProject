@@ -21,7 +21,7 @@ def register_user(request):
     location = request.POST['location']
     description = request.POST['description']
     user = User.objects.create_user(username, email, password)
-    userprofile = UserProfile(user=user, username=username, first_name=first_name, last_name=last_name, birthday=birthday, location=location, description=description)
+    userprofile = UserProfile(user=user, username=username, first_name=first_name, last_name=last_name, birthday=birthday, location=location, description=description, spoiler_protection=False)
     userprofile.save()
     login(request, user)
     return HttpResponseRedirect(reverse('users:protected'))

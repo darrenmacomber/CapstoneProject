@@ -49,19 +49,19 @@
         <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="removeThis(item)">Remove from MyShelf </button></div>
         <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
         <div><hr/></div>
-        <div class="data_field" id="book_comment">
+        <div class="container" id="book_comment">
           <textarea rows="3" cols="50" name="comment_text" v-model="comment_text">
           </textarea>
-          <div><span class="container" id="add_container"><input type="number" id="add_input" v-model="progress_point" placeholder=0 min=0 /><button class="button" id="add_button" v-on:click="commentThis(item)">Add Comment</button></span></div>
+          <div>Page <span class="container" id="add_container"><input type="number" id="add_input" v-model="progress_point" placeholder=0 min=0 /><button class="button" id="add_button" v-on:click="commentThis(item)">Add Comment</button></span></div>
         </div>
         <div><hr/></div>
           <div class ="data_field" v-for="comment in item.comments">
             <div id="user_comment">
-              <div><a v-bind:href="'/profile/userProfile/'+comment.user">User: [[ comment.user ]]</a></div>
+              <div><h3 class="title"><a v-bind:href="'/profile/userProfile/'+comment.user">[[ comment.user ]]</a></h3></div>
               <div>Progress: Page [[comment.progress_point]]</div>
-              <div>Thoughts:
-                <div>[[comment.text]]</div></div>
               <div>Posted on [[comment.date_created]]</div>
+              <div><hr></div>
+              <div>[[comment.text]]</div>
             </div>
           </div>
         <div><hr/></div>
@@ -133,7 +133,7 @@
             let progress_point = comment.progress_point
             let text = comment.text
             if (this.hide_spoilers && item.progress_point < progress_point)
-              text = "[ Admin ]: 🖒 This comment has been filtered due to Spoiler Protection. 🖒"
+              text = "🖒 This comment has been filtered due to Spoiler Protection. 🖒"
             item.comments.push({
               user: user,
               text: text,
@@ -220,6 +220,7 @@
           },
         }
         axios.post("{% url 'ProfileApp:updateProgress' %}", data, config).then(response => {
+          item.progress_point = this.new_bookmark
           if (response.data == 'failure') {
             alert('Please log in.')
           } else {
@@ -238,8 +239,10 @@
           },
         }
         axios.post("{% url 'ProfileApp:removeBook' %}", data, config).then(response => {
-          if (response.data == 'failure') {
+          if (response.data == 'failure1') {
             alert('Please log in.')
+          } else if (response.data == 'failure2'){
+            alert('Not added to MyShelf.')
           } else {
             alert('Successfully removed.')
           }
@@ -295,6 +298,8 @@
           } else {
             alert('Successfully added')
           }
+          this.getBookTags(item)
+
         })
       },
 
@@ -317,6 +322,7 @@
           } else {
             alert('Successfully posted')
           }
+          this.getComments(item)
         })
       },
 

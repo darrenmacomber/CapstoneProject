@@ -1,12 +1,8 @@
 {% extends "APILibraryApp/navigator.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" type="text/css" href="{% static 'users/basestyle.css' %}">
-    <h1>Welcome, {{user.username}}</h1>
-    <a href="{%url 'APILibraryApp:index' %}">Go to Index</a>
-    <a href="{% url 'users:logout_user' %}">Logout</a>
-
-    <ul>
-      seekrit info
-    </ul>
+<link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
+<div class="data_field">
+  <h1>Welcome, {{user.username}}</h1>
+</div>
 {% endblock %}

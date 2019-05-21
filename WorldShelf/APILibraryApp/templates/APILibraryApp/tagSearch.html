@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
   <!--Links CSS Sheet in Static  -->
-  <link rel="stylesheet" type="text/css" href="{% static 'ProfileApp/basestyle.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
   <!-- Search UserTag objects by name field -->
   <div id="TagSearch">
     <div class="title"><h3>Search Tags</h3></div>
@@ -17,7 +17,7 @@
   <!-- Display tag search results; searches extant Book objects for tag on click -->
     <div class="data_field" id="tag_data">
       <div class="container" id="tag_entry" v-for="tagbutton in tagbuttons">
-        <div class="entry_field"><a v-on:click="findTaggedBooks(tagbutton.name)">[[ tagbutton.name ]]</a></div>
+        <div class="entry_field"><a id="add_button" v-on:click="findTaggedBooks(tagbutton.name)">[[ tagbutton.name ]]</a></div>
       </div>
     </div>
     <div class="data_field" id="book_data">

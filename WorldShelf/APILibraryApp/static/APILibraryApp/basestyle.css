@@ -12,11 +12,27 @@ header {
 }
 
 body {
-  background-color: #d6c2b5;
+  background: beige url("images/henry-be-803712-unsplash.jpg") repeat;
+  background-size: 100%;
   font-family: 'Comfortaa';
   margin: 5%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+footer {
+  opacity: 0.85;
+  padding: 10px;
+  margin: 10px;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#header_bar {
+  background: #eddacd url("images/old-grunge-paper-texture-background.jpg")
 }
 
 .title {
@@ -24,14 +40,15 @@ body {
   background-color: #FAE8DD;
   padding: 5px;
   margin: 5px;
+  opacity: 0.8;
+}
+
+.displaybox {
+  background: #eddacd url("images/old-grunge-paper-texture-background.jpg")
 }
 
 .container {
   background-color: #eddacd;
-}
-
-.header_bar {
-  background-color: #FAE8DD;
 }
 
 .navigator_bar {
@@ -42,14 +59,17 @@ body {
   justify-content: space-around;
   margin: 5px;
   padding: 5px;
+  opacity: 0.8;
 }
 
 a:link {
+  cursor: pointer;
   color: black;
   text-decoration: none;
 }
 
 a:visited {
+  cursor: pointer;
   color: black;
   text-decoration: none;
 }
@@ -64,7 +84,9 @@ a:visited {
 }
 
 .data_field {
-  background-color: #eddacd;
+  background: #eddacd url("images/old-grunge-paper-texture-background.jpg");
+  background-size: 100%
+  /* background-color: #eddacd; */
 }
 
 .data_field > *{
@@ -73,8 +95,9 @@ a:visited {
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
-  padding: 5px;
-  margin: 5px;
+  padding: 10px;
+  margin: 10px;
+  opacity: 0.8;
 }
 
 .entry_field {
@@ -82,12 +105,12 @@ a:visited {
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin: 5px;
+  margin: 10px;
+  opacity: 0.8;
 }
 
 #add_button {
   cursor: pointer;
-  background-color: white;
   border-radius: 10px;
   font-family: 'Comfortaa';
   font-size: 18px;

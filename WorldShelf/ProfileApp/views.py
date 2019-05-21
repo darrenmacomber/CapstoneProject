@@ -127,8 +127,11 @@ def removeBook(request):
             target_userbook = target_book.userbooks.get(user=request.user)
             target_userbook.delete()
             return HttpResponse('success')
-    return HttpResponse('failure')
+        return HttpResponse('failure2')
+    return HttpResponse('failure1')
 
 @login_required
 def editProfile(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('users/register_login.html')
     return render(request, 'ProfileApp/editProfile.html')

@@ -1,51 +1,61 @@
 {% extends "APILibraryApp/navigator.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" type="text/css" href="{% static 'users/basestyle.css' %}">
-    <h1>Login</h1>
+<link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
+<div class= "data_field">
+  <h1>Login</h1>
+  <div class="add_container">
     <form action="{% url 'users:login_user' %}" method="post">
       {% csrf_token %}
-      <input type="text" name="username" placeholder="username"/>
-      <input type="location" name="password" placeholder="password"/>
-      <button type="submit">Login</button>
+      <span>
+        <input type="text" name="username" placeholder="username"/>
+      </span>
+      <span>
+        <input type="password" name="password" placeholder="password"/>
+      </span>
+      <span>
+        <button type="submit">Login</button>
+      </span>
     </form>
-    <hr/>
-    <h1>Register</h1>
+  </div>
+  <h1>Register</h1>
+  <div class="add_container">
     <form action="{% url 'users:register_user' %}" method="post">
       {% csrf_token %}
       User Name
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <input type="text" name="username" placeholder="username"/>
-      </div>
+      </span>
       Name
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <input type="text" name="first_name" placeholder="first name"/>
-      </div>
-      <div class="data_field" id="profile_info">
+      </span>
+      <span class="data_field" id="profile_info">
         <input type="text" name="last_name" placeholder="last name"/>
-      </div>
+      </span>
       Email
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <input type="text" name="email" placeholder="email address"/>
-      </div>
+      </span>
       Birthday
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <input type="date" name="birthday" placeholder="birthday"/>
-      </div>
+      </span>
       Location
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <input type="text" name="location" placeholder="location"/>
-      </div>
+      </span>
       Description
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <textarea rows="5" cols="60" name="description" v-model="description">
         </textarea><br>
-      </div>
+      </span>
       Password
-      <div class="data_field" id="profile_info">
+      <span class="data_field" id="profile_info">
         <input type="password" name="password" placeholder="password"/>
-      </div>
+      </span>
       <button type="submit">Register</button>
     </form>
-
+  </div>
+</div>
 {% endblock %}
