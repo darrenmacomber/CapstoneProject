@@ -51,3 +51,22 @@ class UserBook(models.Model):
 
     def __str__(self):
         return self.book.title
+
+class UserComment(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.PROTECT, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comments')
+    text = models.TextField()
+    progress_point = models.IntegerField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_edited = models.DateTimeField(auto_now=True)
+
+    def prettycreatedate(self):
+        converted = self.date_edited.strftime('%B %d, %Y')
+        return converted
+
+    def prettyeditdate(self):
+        converted = self.date_edited.strftime('%B %d, %Y')
+        return converted
+
+    def __str__(self):
+        return 'UserComment('+ str(self.id) +'):' + self.book.title + ', ' + self.user.username

@@ -11,6 +11,7 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    spoiler_protection = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

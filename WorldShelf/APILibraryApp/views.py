@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .models import Book, Author, Category, UserTag, UserBook
+from .models import Book, Author, Category, UserTag, UserBook, UserComment
+from ProfileApp.views import makeComment
 
 import json
 
@@ -24,7 +25,7 @@ def saveBook(request):
             return HttpResponse('already added')
         else:
             user = request.user
-            userbook = UserBook(user=user, book=book, progress=0, impressions='')
+            userbook = UserBook(user=user, book=target_book, progress=0)
             userbook.save()
             return HttpResponse('success')
     title = data['title']
@@ -47,23 +48,9 @@ def saveBook(request):
         category, created = Category.objects.get_or_create(name=category)
         book.category_tags.add(category)
     user = request.user
-    userbook = UserBook(user=user, book=book, progress=0, impressions='')
+    userbook = UserBook(user=user, book=book, progress=0)
     userbook.save()
     return HttpResponse('success')
-
-def removeBook(request):
-    if not request.user.is_authenticated:
-        return HttpResponse('failure')
-    data = json.loads(request.body)
-    bookID = data['bookID']
-    if Book.objects.filter(bookID = bookID).exists():
-        target_book = Book.objects.get(bookID = bookID)
-        if target_book.users.filter(username= request.user).exists():
-            return HttpResponse('already added')
-        else:
-            target_book.users.add(request.user)
-            target_book.save()
-            return HttpResponse('success')
 
 def getUserBooks(request):
     indata = json.loads(request.body)

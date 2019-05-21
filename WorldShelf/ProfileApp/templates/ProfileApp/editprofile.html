@@ -30,6 +30,8 @@
   <div class="button" id="submit_button">
     <button v-on:click="saveProfile">Submit</button>
   </div>
+  <div class="checkbox" id="spoiler_check">
+    <input type="checkbox" v-model="spoiler_check"/>
 </div>
 <script type="text/javascript">
   let ProfileFill = new Vue({
@@ -42,6 +44,7 @@
       location: "Location",
       description: "Enter details here.",
       items: [],
+      spoiler_check: false,
     },
 
     methods: {
@@ -54,6 +57,7 @@
           'birthday': this.birthday,
           'location': this.location,
           'description': this.description,
+          'spoiler_check': this.spoiler_check,
         }
         let config = {
           headers: {

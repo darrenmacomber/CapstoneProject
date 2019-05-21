@@ -23,7 +23,7 @@
 </div>
 <div class="container" id="MyShelf">
     <div class="data_field" id="book_data">
-      <div class="title"><h2>{{ profile.username }}'s Bookshelf</h2></div>
+      <div class="title"><h2>MyShelf</h2></div>
       <div class="container" id="book_entry" v-for="item in items">
         <div class="image"><img v-bind:src="item.thumbnail"/></div>
         <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
@@ -38,13 +38,32 @@
         <div class="entry_field"><a>Categories: <span v-for="tag in item.category_tags"> [[ tag ]] </span></a></div>
         <div class="entry_field"><a>User Tags: <span v-for="(tag, index) in item.user_tags">[[ tag ]]<span v-if="index+1 < item.user_tags.length"> / </span></span></a></div>
         <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
-        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
+        <div class="entry_field"><a>User Progress: Page [[ item.progress_point ]]</a></div>
+        <div class="container" id="add_container"><span><button class="button" id="add_button" v-on:click="updateThis(item)">Update Bookmark</button><input type="number" id="add_input" v-model="new_bookmark" placeholder=0 min=0 /></span></div>
         <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="tagThis(item)">Add Tag to Book</button>
           <select id="tag_select" v-model="select_tag">
             <option></option>
             <option v-for="tag in tags">[[ tag.name ]]</option>
           </select>
         </div>
+        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="removeThis(item)">Remove from MyShelf </button></div>
+        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
+        <div><hr/></div>
+        <div class="data_field" id="book_comment">
+          <textarea rows="3" cols="50" name="comment_text" v-model="comment_text">
+          </textarea>
+          <div><span class="container" id="add_container"><input type="number" id="add_input" v-model="progress_point" placeholder=0 min=0 /><button class="button" id="add_button" v-on:click="commentThis(item)">Add Comment</button></span></div>
+        </div>
+        <div><hr/></div>
+          <div class ="data_field" v-for="comment in item.comments">
+            <div id="user_comment">
+              <div><a v-bind:href="'/profile/userProfile/'+comment.user">User: [[ comment.user ]]</a></div>
+              <div>Progress: Page [[comment.progress_point]]</div>
+              <div>Thoughts:
+                <div>[[comment.text]]</div></div>
+              <div>Posted on [[comment.date_created]]</div>
+            </div>
+          </div>
         <div><hr/></div>
       </div>
     </div>
@@ -58,11 +77,23 @@
       select_tag: '',
       items: [],
       tags: [],
+      progress_point: 0,
+      comment_text: '',
       resultsPerPage: 10,
       page: 1,
+      hide_spoilers: false,
+      new_bookmark: 0,
     },
 
     methods: {
+      spoilerProtection: function(){
+        axios.get("{% url 'ProfileApp:spoilerProtection'%}").then(response => {
+          let data = response.data
+          this.hide_spoilers = data.spoiler_protection[0].spoiler_protection
+          console.log(this.hide_spoilers)
+        })
+      },
+
       checkValue: function(value) {
         if (!value) {
           return ''
@@ -90,7 +121,31 @@
         })
       },
 
-      lookup: function(volume_id) {
+      getComments: function(item) {
+        axios.get("{% url 'ProfileApp:getComments' %}?bookID=" + item.bookID).then(response => {
+          let data = response.data
+          item.comments = []
+          for (let i=0; i<data.comments.length; ++i) {
+            let comment = data.comments[i]
+            let user = comment.user
+            let date_created = comment.date_created
+            let date_edited = comment.date_edited
+            let progress_point = comment.progress_point
+            let text = comment.text
+            if (this.hide_spoilers && item.progress_point < progress_point)
+              text = "[ Admin ]: 🖒 This comment has been filtered due to Spoiler Protection. 🖒"
+            item.comments.push({
+              user: user,
+              text: text,
+              date_created: date_created,
+              date_edited: date_edited,
+              progress_point: progress_point,
+            })
+          }
+        })
+      },
+
+      lookup: function(volume_id, progress) {
         let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
         let startIndex = (this.page - 1)*this.resultsPerPage
         let maxResults = this.resultsPerPage
@@ -103,7 +158,6 @@
         axios.get(url, config).then(response => {
           let data = response.data
           this.startIndex = response.data.startIndex
-          // insert spoiler protection function here
           let bookID = data.id
           let title = data.volumeInfo.title
           let authors = data.volumeInfo.authors
@@ -130,6 +184,7 @@
           let thumbnail = ''
           if (data.volumeInfo.imageLinks)
             thumbnail = data.volumeInfo.imageLinks.thumbnail
+          let progress_point = progress
           item = {
               bookID: bookID,
               title: title,
@@ -145,9 +200,49 @@
               user_tags: [],
               description: description,
               thumbnail: thumbnail,
+              comments: [],
+              progress_point: progress_point
             }
             this.getBookTags(item)
+            this.getComments(item)
             this.items.push(item)
+        })
+      },
+
+      updateThis: function(item) {
+        let data = {
+          'bookID': item.bookID,
+          'progress_point': this.new_bookmark,
+          }
+        let config = {
+          headers: {
+            'X-CSRFToken': '{{csrf_token}}',
+          },
+        }
+        axios.post("{% url 'ProfileApp:updateProgress' %}", data, config).then(response => {
+          if (response.data == 'failure') {
+            alert('Please log in.')
+          } else {
+            alert('Successfully updated.')
+          }
+        })
+      },
+
+      removeThis: function(item) {
+        let data = {
+          'bookID': item.bookID,
+        }
+        let config = {
+          headers: {
+            'X-CSRFToken': '{{csrf_token}}',
+          },
+        }
+        axios.post("{% url 'ProfileApp:removeBook' %}", data, config).then(response => {
+          if (response.data == 'failure') {
+            alert('Please log in.')
+          } else {
+            alert('Successfully removed.')
+          }
         })
       },
 
@@ -168,8 +263,8 @@
         }
         let config = {
           headers: {
-            'X-CSRFToken': '{{csrf_token}}'
-          }
+            'X-CSRFToken': '{{csrf_token}}',
+          },
         }
         axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(response => {
           if (response.data == 'failure') {
@@ -189,7 +284,7 @@
         }
         let config = {
           headers: {
-            'X-CSRFToken': '{{csrf_token}}'
+            'X-CSRFToken': '{{csrf_token}}',
           },
         }
         axios.post("{% url 'APILibraryApp:saveTags' %}", data, config).then(response => {
@@ -203,14 +298,36 @@
         })
       },
 
-      getUserBooks: function() {
+      commentThis: function(item) {
         let data = {
-          user: "{{profile_user.username}}"
+          'bookID': item.bookID,
+          'progress_point': this.progress_point,
+          'text': this.comment_text,
+          'user': "{{profile_user.username}}",
         }
         let config = {
           headers: {
             'X-CSRFToken': '{{csrf_token}}'
+          },
+        }
+        axios.post("{% url 'ProfileApp:makeComment' %}", data, config).then(response => {
+          let data = response.data
+          if (response.data == 'failure') {
+            alert('Please log in.')
+          } else {
+            alert('Successfully posted')
           }
+        })
+      },
+
+      getUserBooks: function() {
+        let data = {
+          user: "{{profile_user.username}}",
+        }
+        let config = {
+          headers: {
+            'X-CSRFToken': '{{csrf_token}}'
+          },
         }
         axios.post("{% url 'APILibraryApp:getUserBooks' %}", data, config).then(response => {
           let data = response.data
@@ -227,13 +344,14 @@
             this.userbooks.push(userbook)
           }
           for (let i=0; i<this.userbooks.length; i++) {
-            this.lookup(this.userbooks[i].bookID)
+            this.lookup(this.userbooks[i].bookID, this.userbooks[i].progress)
           }
         })
       },
     },
 
   created: function() {
+    this.spoilerProtection()
     this.getUserBooks()
     this.tagGen()
   },
