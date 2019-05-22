@@ -1,87 +1,91 @@
 {% extends "APILibraryApp/navigator.html" %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
-<div class="data_field" id="ProfileFill">
-  <div class="title">
-    <h2>Edit Profile</h2>
-  </div>
-  <div class="container">
+  <link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
+  <div class="data_field" id="ProfileFill">
     <div class="title">
-      <h3>{{user.username}}</h3>
+      <h2>Edit Profile</h2>
     </div>
+    <!--UserProfile editing form.-->
     <div class="container">
-      <div>Name</div>
-      <span class="add_container" id="profile_info">
-        <input class="input_profile" id="name1" placeholder="First" v-model="first_name"/>
-      </span>
-      <span class="add_container" id="profile_info">
-        <input class="input_profile" id="name2" placeholder="Last" v-model="last_name"/>
-      </span>
-      <div>Birthday</div>
-      <div class="add_container" id="profile_info">
-        <input class="input_profile" id="birthday" type="date" v-model="birthday"/>
+      <div class="title">
+        <h3>{{user.username}}</h3>
       </div>
-      <div>Location</div>
-      <div class="add_container" id="profile_info">
-        <input class="input_profile" id="location" v-model="location"/>
-      </div>
-      <div>Describe Yourself!</div>
-      <div class="add_container" id="profile_info">
-        <textarea rows="5" cols="60" name="description" v-model="description">
-        </textarea><br>
-      </div>
-      <div>Spoiler Protection</div>
-      <div class="checkbox" id="spoiler_check">
-        <input type="checkbox" v-model="spoiler_check"/>
-      </div>
-      <div class="button" id="submit_button">
-        <button v-on:click="saveProfile">Submit</button>
+      <div class="container">
+        <div>Name</div>
+        <span class="add_container" id="profile_info">
+          <input class="input_profile" id="name1" placeholder="First" v-model="first_name"/>
+        </span>
+        <span class="add_container" id="profile_info">
+          <input class="input_profile" id="name2" placeholder="Last" v-model="last_name"/>
+        </span>
+        <div>Birthday</div>
+        <div class="add_container" id="profile_info">
+          <input class="input_profile" id="birthday" type="date" v-model="birthday"/>
+        </div>
+        <div>Location</div>
+        <div class="add_container" id="profile_info">
+          <input class="input_profile" id="location" v-model="location"/>
+        </div>
+        <div>Describe Yourself!</div>
+        <div class="add_container" id="profile_info">
+          <textarea rows="5" cols="60" name="description" v-model="description">
+          </textarea><br>
+        </div>
+        <div>Spoiler Protection</div>
+        <div class="checkbox" id="spoiler_check">
+          <input type="checkbox" v-model="spoiler_check"/>
+        </div>
+        <div class="button" id="submit_button">
+          <button v-on:click="saveProfile">Submit</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<script type="text/javascript">
-  let ProfileFill = new Vue({
-    el: '#ProfileFill',
-    delimiters: ["[[", "]]"],
-    data: {
-      first_name: "First Name",
-      last_name: "Last Name",
-      birthday: "mm / dd / yyyy",
-      location: "Location",
-      description: "Enter details here.",
-      items: [],
-      spoiler_check: false,
-    },
 
-    methods: {
-      saveProfile: function(item) {
-        let app = this
-        let data = {
-          'username': "{{ user.username }}",
-          'first_name': this.first_name,
-          'last_name': this.last_name,
-          'birthday': this.birthday,
-          'location': this.location,
-          'description': this.description,
-          'spoiler_check': this.spoiler_check,
-        }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}'
+  <script type="text/javascript">
+    let ProfileFill = new Vue({
+      el: '#ProfileFill',
+      delimiters: ["[[", "]]"],
+      data: {
+        first_name: "First Name",
+        last_name: "Last Name",
+        birthday: "mm / dd / yyyy",
+        location: "Location",
+        description: "Enter details here.",
+        items: [],
+        spoiler_check: false,
+      },
+
+      methods: {
+        // Edits parameters according to data entered into vue and saves UserProfile.
+        saveProfile: function(item) {
+          let app = this
+          let data = {
+            'username': "{{ user.username }}",
+            'first_name': this.first_name,
+            'last_name': this.last_name,
+            'birthday': this.birthday,
+            'location': this.location,
+            'description': this.description,
+            'spoiler_check': this.spoiler_check,
           }
-        }
-        axios.post("{% url 'ProfileApp:updateProfile' %}", data, config).then(function(response) {
-          console.log(response.data)
-          if (response.data == 'success') {
-            alert('Profile Updated.')
-          } else {
-            alert('Error.')
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}'
+            }
           }
-        })
+          // Alerts based on HTML response.
+          axios.post("{% url 'ProfileApp:updateProfile' %}", data, config).then(function(response) {
+            console.log(response.data)
+            if (response.data == 'success') {
+              alert('Profile Updated.')
+            } else {
+              alert('Error.')
+            }
+          })
+        }
       }
-    }
-  })
-</script>
+    })
+  </script>
 {% endblock %}

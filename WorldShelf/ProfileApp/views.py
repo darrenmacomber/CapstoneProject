@@ -10,12 +10,18 @@ from APILibraryApp.models import Book, Author, Category, UserTag, UserBook, User
 
 import json, datetime
 
+
 def index(request):
     return HttpResponse('ok')
 
+'''Renders Profile search page'''
 def searchProfiles(request):
     return render(request, 'ProfileApp/searchProfiles.html')
 
+'''Checks UserProfile instance to see if spoiler protection is enabled'''
+# Input includes current user.
+# Checks the UserProfile associated with the current user's username
+# Retrives boolean info from the UserProfile's spoiler_portection parameter and sends to vue in json.
 def spoilerProtection(request):
     current_user = request.user
     target_profile = UserProfile.objects.get(username=current_user)
@@ -25,6 +31,9 @@ def spoilerProtection(request):
         })
     return JsonResponse(data)
 
+'''Retrieves a list of all Users and their parameters'''
+# Checks database for User model instances
+# Parses info from each user's associated profile into json data to send to vue.
 def getUsers(request):
     data = {'users': []}
     user_array = User.objects.all()
@@ -42,6 +51,12 @@ def getUsers(request):
         })
     return JsonResponse(data)
 
+'''Upadates the page the user is currently on in their specific book'''
+# Checks for login.
+# Checks for correct User instance associated with this UserProfile.
+# Retrieves updated progress point page from the json input.
+# Finds UserBook instance associated with user, if it exists, and updates its progress_point parameter.
+# Returns HTTP response confirmation.
 def updateProgress(request):
     if request.user.is_authenticated:
         data = json.loads(request.body)
@@ -58,6 +73,11 @@ def updateProgress(request):
             return HttpResponse('success')
     return HttpResponse('failure')
 
+'''Updates the info in a specific user's profile page'''
+# Doesn't check for login as this is only rendered on the @protected page.
+# Retrieves new profile parameters from json input.
+# Finds UserProfile instance associated with current username.
+# Updates parameters and sends HTTP response confirmation.
 def updateProfile(request):
     data = json.loads(request.body)
     username = request.user
@@ -71,6 +91,10 @@ def updateProfile(request):
     target_profile.save()
     return HttpResponse('success')
 
+'''Creates an instance of the UserProfile model'''
+# Called automatically during the User creation function.
+# Params set by input fields on register_login page.
+# Associates new UserProfile instance with User's username.
 def userProfile(request, username):
     target_profile = UserProfile.objects.get(username=username)
     context = {
@@ -88,6 +112,10 @@ def userProfile(request, username):
     }
     return render(request, 'ProfileApp/userProfile.html', context)
 
+'''Retrieves all Comments associated with this specific Book'''
+# bookID retrieved from json input.
+# Searches Book instances for Book with that bookID.
+# searchs that book .comments for all objects and sends to vue as json response.
 def getComments(request):
     bookID = request.GET['bookID']
     data = {'comments': []}
@@ -104,7 +132,10 @@ def getComments(request):
             })
     return JsonResponse(data)
 
-
+'''Adds Comment to be associated with this Book'''
+# Checks for login.
+# bookID retrieved from json input.
+# After searching Book instances for the Book with that bookID, creates Comment associated with Book.
 def makeComment(request):
     if not request.user.is_authenticated:
         return HttpResponse('failure')
@@ -118,6 +149,13 @@ def makeComment(request):
     usercomment.save()
     return HttpResponse('success')
 
+'''Removes Book from UserProfile'''
+# This function actually removes the UserBook instance rather than the Book.
+# Checks for login.
+# Checks for correct User instance associated with this UserProfile.
+# bookID finds the target Book instance.
+# username from json response used to find the UserBook associated with that Book.
+# UserBook is deleted and HTTP confirmation is returned.
 def removeBook(request):
     if request.user.is_authenticated:
         data = json.loads(request.body)
@@ -130,6 +168,7 @@ def removeBook(request):
         return HttpResponse('failure2')
     return HttpResponse('failure1')
 
+'''Renders the Edit Profile page'''
 @login_required
 def editProfile(request):
     if not request.user.is_authenticated:

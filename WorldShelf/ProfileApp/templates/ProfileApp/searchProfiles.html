@@ -14,17 +14,17 @@
       </div>
     </div>
   <!-- Navigator bar flexbox containing search parameters -->
-  <div class="data_field" id="profile_data">
-    <div class="container" id="profile_entry" v-for="item in items">
-      <div class="entry_field"><a v-bind:href="'/profile/userProfile/'+item.username">[[ item.username ]]</a></div>
-      <div class="entry_field"><a>Born: [[ item.prettybirthday ]]</a></div>
-      <div class="entry_field"><a>Location: [[ item.location ]]</a></div>
-      <div><hr/></div>
+    <div class="data_field" id="profile_data">
+      <div class="container" id="profile_entry" v-for="item in items">
+        <div class="entry_field"><a v-bind:href="'/profile/userProfile/'+item.username">[[ item.username ]]</a></div>
+        <div class="entry_field"><a>Born: [[ item.prettybirthday ]]</a></div>
+        <div class="entry_field"><a>Location: [[ item.location ]]</a></div>
+        <div><hr/></div>
+      </div>
     </div>
   </div>
-</div>
   <script type="text/javascript">
-
+    // Searches string for query.
     function contains(text, query) {
       return text.toLowerCase().indexOf(query.toLowerCase()) != -1
     }
@@ -38,6 +38,7 @@
       },
 
       methods: {
+        // Finds any Users with username parameters that contain query.
         lookup: function() {
           axios.get("{% url 'ProfileApp:getUsers' %}").then(response => {
             let data = response.data

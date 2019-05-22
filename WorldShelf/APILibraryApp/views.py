@@ -8,12 +8,17 @@ import json
 def index(request):
     return HttpResponse('ok')
 
+'''Renders Search pages'''
 def bookSearch(request):
     return render(request, 'APILibraryApp/bookSearch.html')
 
 def tagSearch(request):
     return render(request, 'APILibraryApp/tagSearch.html')
 
+'''Creates a new Book object'''
+# Searches for Book and UserBook to avoid redundancy.
+# Creates Book instance and sets parameters according to json input.
+# Creates BookUser instance to represent the User's personalized activity regarding the book.
 def saveBook(request):
     if not request.user.is_authenticated:
         return HttpResponse('failure')
@@ -52,6 +57,10 @@ def saveBook(request):
     userbook.save()
     return HttpResponse('success')
 
+'''Populates MyShelf with Books associated with the Profile's User'''
+# Determines which profile is being rendered from the json input.
+# Searches UserBook associated with that username.
+# Sends info of any Books associated with that UserBook instance in json to vue for rendering.
 def getUserBooks(request):
     indata = json.loads(request.body)
     target_user = indata['user']
@@ -70,6 +79,8 @@ def getUserBooks(request):
                 })
     return JsonResponse(data)
 
+'''Retrieves a list of all UserTags'''
+# Searches UserTag instances and sends in json response to vue for rendering.
 def getTags(request):
     data = {'tags': []}
     tag_array = UserTag.objects.all()
@@ -80,6 +91,10 @@ def getTags(request):
         })
     return JsonResponse(data)
 
+'''Searches database for any Books that have the designated UserTag'''
+# Request input gives json info containing target UserTag.
+# Searches Book instances for any that have the designated UserTag name.
+# Sends in json response to vue to designate specifically which Books to render.
 def findTaggedBooks(request):
     indata = json.loads(request.body)
     target_tag = indata['target_tag']
@@ -93,6 +108,10 @@ def findTaggedBooks(request):
                 })
     return JsonResponse(data)
 
+'''Finds UserTags associated with a specific Book'''
+# Inverse of findTaggedBooks.
+# json provides bookID, searches Books according to their bookID parameter.
+# Sends in json response to vue to designate specifically which UserTags to render.
 def bookTags(request):
     bookID = request.GET['bookID']
     data = {'UserTag': []}
@@ -102,17 +121,23 @@ def bookTags(request):
             data['UserTag'].append(tag.name)
     return JsonResponse(data)
 
+'''Adds UserTag to Book'''
+# On any user Profile, you can use the drop-down menu to select a UserTag.
+# Vue parses that UserTag name and BookID to json input.
+# Searches Books according to bookID and finds target book.
+# Target book's UserTags are searched to see if the UserTag has alraedy been added.
+# Adds tag and sends confirmation HTTP response.
 def saveTags(request):
-    if not request.user.is_authenticated:
-        return HttpResponse('failure')
-    data = json.loads(request.body)
-    bookID = data['bookID']
-    name = data['tag']
-    target_tag = UserTag.objects.get(name=name)
-    if Book.objects.filter(bookID = bookID).exists():
-        target_book = Book.objects.get(bookID = bookID)
-        if target_book.user_tags.filter(name=name).exists():
-            return HttpResponse('already added')
-        target_book.user_tags.add(target_tag)
-        target_book.save()
-        return HttpResponse('success')
+    if request.user.is_authenticated:
+        data = json.loads(request.body)
+        bookID = data['bookID']
+        name = data['tag']
+        target_tag = UserTag.objects.get(name=name)
+        if Book.objects.filter(bookID = bookID).exists():
+            target_book = Book.objects.get(bookID = bookID)
+            if target_book.user_tags.filter(name=name).exists():
+                return HttpResponse('already added')
+            target_book.user_tags.add(target_tag)
+            target_book.save()
+            return HttpResponse('success')
+    return HttpResponse('failure')

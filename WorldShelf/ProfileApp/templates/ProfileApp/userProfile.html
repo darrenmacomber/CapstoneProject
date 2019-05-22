@@ -1,366 +1,376 @@
 {% extends "APILibraryApp/navigator.html" %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
-<div class="data_field" id="Profile">
-  <div class="title"><h2>{{ profile.username }}</h2></div>
-  <div class="entry_field" id="profile_info">
-    Name:<br>
-    <span> {{ profile.first_name }} {{ profile.last_name }}</span>
-  </div>
-  <div class="entry_field" id="profile_info">
-    Birthday:<br>
-    <span> {{ profile.prettybirthday }}</span>
-  </div>
-  <div class="entry_field" id="profile_info">
-    Location:<br>
-    <span> {{ profile.location }}</span>
-  </div>
-  <div class="entry_field" id="profile_info">
-    Description:<br>
-    <div> {{ profile.description }}</div>
-  </div>
-</div>
-<div class="container" id="MyShelf">
-    <div class="data_field" id="book_data">
-      <div class="title"><h2>MyShelf</h2></div>
-      <div class="container" id="book_entry" v-for="item in items">
-        <div class="image"><img v-bind:src="item.thumbnail"/></div>
-        <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
-        <div class="entry_field"><a>Title: [[ item.title ]]</a></div>
-        <div class="entry_field"><a>Author: <span v-for="(author, index) in item.authors"> [[ author ]]<span v-if="index+1 < item.authors.length"> / </span></span></a></div>
-        <div class="entry_field"><a>Languages: [[ item.languages ]]</a></div>
-        <div class="entry_field"><a>Pages: [[ item.page_count ]]</a></div>
-        <div class="entry_field"><a>Published: [[ item.publish_date ]]</a></div>
-        <div class="entry_field"><a>Publisher: [[ item.publisher ]]</a></div>
-        <div class="entry_field"><a>ISBN: <span v-for="(isbn, index) in item.isbn_array">[[ isbn.identifier ]]<span v-if="index+1 < item.isbn_array.length"> / </span></span></a></div>
-        <div class="entry_field"><a>Ebook: [[ item.is_ebook ]]</a></div>
-        <div class="entry_field"><a>Categories: <span v-for="tag in item.category_tags"> [[ tag ]] </span></a></div>
-        <div class="entry_field"><a>User Tags: <span v-for="(tag, index) in item.user_tags">[[ tag ]]<span v-if="index+1 < item.user_tags.length"> / </span></span></a></div>
-        <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
-        <div class="entry_field"><a>User Progress: Page [[ item.progress_point ]]</a></div>
-        <div class="container" id="add_container"><span><button class="button" id="add_button" v-on:click="updateThis(item)">Update Bookmark</button><input type="number" id="add_input" v-model="new_bookmark" placeholder=0 min=0 /></span></div>
-        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="tagThis(item)">Add Tag to Book</button>
-          <select id="tag_select" v-model="select_tag">
-            <option></option>
-            <option v-for="tag in tags">[[ tag.name ]]</option>
-          </select>
-        </div>
-        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="removeThis(item)">Remove from MyShelf </button></div>
-        <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
-        <div><hr/></div>
-        <div class="container" id="book_comment">
-          <textarea rows="3" cols="50" name="comment_text" v-model="comment_text">
-          </textarea>
-          <div>Page <span class="container" id="add_container"><input type="number" id="add_input" v-model="progress_point" placeholder=0 min=0 /><button class="button" id="add_button" v-on:click="commentThis(item)">Add Comment</button></span></div>
-        </div>
-        <div><hr/></div>
-          <div class ="data_field" v-for="comment in item.comments">
-            <div id="user_comment">
-              <div><h3 class="title"><a v-bind:href="'/profile/userProfile/'+comment.user">[[ comment.user ]]</a></h3></div>
-              <div>Progress: Page [[comment.progress_point]]</div>
-              <div>Posted on [[comment.date_created]]</div>
-              <div><hr></div>
-              <div>[[comment.text]]</div>
-            </div>
-          </div>
-        <div><hr/></div>
-      </div>
+  <link rel="stylesheet" type="text/css" href="{% static "APILibraryApp/basestyle.css" %}">
+  <div class="data_field" id="Profile">
+  <!--Displays UserProfile parameters.-->
+    <div class="title"><h2>{{ profile.username }}</h2></div>
+    <div class="entry_field" id="profile_info">
+      Name:<br>
+      <span> {{ profile.first_name }} {{ profile.last_name }}</span>
     </div>
-</div>
-<script type="text/javascript">
-  let MyShelf = new Vue({
-    el: '#MyShelf',
-    delimiters: ['[[', ']]'],
-    data: {
-      userbooks: [],
-      select_tag: '',
-      items: [],
-      tags: [],
-      progress_point: 0,
-      comment_text: '',
-      resultsPerPage: 10,
-      page: 1,
-      hide_spoilers: false,
-      new_bookmark: 0,
-    },
+    <div class="entry_field" id="profile_info">
+      Birthday:<br>
+      <span> {{ profile.prettybirthday }}</span>
+    </div>
+    <div class="entry_field" id="profile_info">
+      Location:<br>
+      <span> {{ profile.location }}</span>
+    </div>
+    <div class="entry_field" id="profile_info">
+      Description:<br>
+      <div> {{ profile.description }}</div>
+    </div>
+  </div>
+  <!--Displays API data looked up from the list of UserBooks associated with this User-->
+  <div class="container" id="MyShelf">
+      <div class="data_field" id="book_data">
+        <div class="title"><h2>MyShelf</h2></div>
+        <div class="container" id="book_entry" v-for="item in items">
+          <div class="image"><img v-bind:src="item.thumbnail"/></div>
+          <div class="entry_field"><a>ID: [[item.bookID]]</a></div>
+          <div class="entry_field"><a>Title: [[ item.title ]]</a></div>
+          <div class="entry_field"><a>Author: <span v-for="(author, index) in item.authors"> [[ author ]]<span v-if="index+1 < item.authors.length"> / </span></span></a></div>
+          <div class="entry_field"><a>Languages: [[ item.languages ]]</a></div>
+          <div class="entry_field"><a>Pages: [[ item.page_count ]]</a></div>
+          <div class="entry_field"><a>Published: [[ item.publish_date ]]</a></div>
+          <div class="entry_field"><a>Publisher: [[ item.publisher ]]</a></div>
+          <div class="entry_field"><a>ISBN: <span v-for="(isbn, index) in item.isbn_array">[[ isbn.identifier ]]<span v-if="index+1 < item.isbn_array.length"> / </span></span></a></div>
+          <div class="entry_field"><a>Ebook: [[ item.is_ebook ]]</a></div>
+          <div class="entry_field"><a>Categories: <span v-for="tag in item.category_tags"> [[ tag ]] </span></a></div>
+          <div class="entry_field"><a>User Tags: <span v-for="(tag, index) in item.user_tags">[[ tag ]]<span v-if="index+1 < item.user_tags.length"> / </span></span></a></div>
+          <div class="entry_field"><a>Description:<br> [[ item.description ]]</a></div>
+          <div class="entry_field"><a>User Progress: Page [[ item.progress_point ]]</a></div>
+          <!--Controls to manipulate the Book instance or edit/create your own UserBook instance.-->
+          <div class="container" id="add_container"><span><button class="button" id="add_button" v-on:click="updateThis(item)">Update Bookmark</button><input type="number" id="add_input" v-model="new_bookmark" placeholder=0 min=0 /></span></div>
+          <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="tagThis(item)">Add Tag to Book</button>
+            <select id="tag_select" v-model="select_tag">
+              <option></option>
+              <option v-for="tag in tags">[[ tag.name ]]</option>
+            </select>
+          </div>
+          <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="removeThis(item)">Remove from MyShelf </button></div>
+          <div class="container" id="add_container"><button class="button" id="add_button" v-on:click="saveThis(item)">Add Book to MyShelf </button></div>
+          <div><hr/></div>
+          <!--Controls to add a Comment to this Book instance.-->
+          <div class="container" id="book_comment">
+            <textarea rows="3" cols="50" name="comment_text" v-model="comment_text">
+            </textarea>
+            <div>Page <span class="container" id="add_container"><input type="number" id="add_input" v-model="progress_point" placeholder=0 min=0 /><button class="button" id="add_button" v-on:click="commentThis(item)">Add Comment</button></span></div>
+          </div>
+          <div><hr/></div>
+          <!--Displays Comments and links to the commenting UserProfile.-->
+            <div class ="data_field" v-for="comment in item.comments">
+              <div id="user_comment">
+                <div><h3 class="title"><a v-bind:href="'/profile/userProfile/'+comment.user">[[ comment.user ]]</a></h3></div>
+                <div>Progress: Page [[comment.progress_point]]</div>
+                <div>Posted on [[comment.date_created]]</div>
+                <div><hr></div>
+                <div>[[comment.text]]</div>
+              </div>
+            </div>
+          <div><hr/></div>
+        </div>
+      </div>
+  </div>
 
-    methods: {
-      spoilerProtection: function(){
-        axios.get("{% url 'ProfileApp:spoilerProtection'%}").then(response => {
-          let data = response.data
-          this.hide_spoilers = data.spoiler_protection[0].spoiler_protection
-          console.log(this.hide_spoilers)
-        })
+  <script type="text/javascript">
+    let MyShelf = new Vue({
+      el: '#MyShelf',
+      delimiters: ['[[', ']]'],
+      data: {
+        userbooks: [],
+        select_tag: '',
+        items: [],
+        tags: [],
+        progress_point: 0,
+        comment_text: '',
+        resultsPerPage: 10,
+        page: 1,
+        hide_spoilers: false,
+        new_bookmark: 0,
       },
 
-      checkValue: function(value) {
-        if (!value) {
-          return ''
-        }
-        return value
-      },
-
-      tagGen: function() {
-        axios.get("{% url 'APILibraryApp:getTags' %}").then(response => {
-          let data = response.data
-          this.tags = []
-          for (let i=0; i<data.tags.length; ++i) {
-            let name = data.tags[i].name
-            this.tags.push({
-              name: name,
-            })
+      methods: {
+        // This function, when the boolean is True, prevents the Text field from rendering for any Comment made by a User indicating they're further in the Book.
+        spoilerProtection: function(){
+          axios.get("{% url 'ProfileApp:spoilerProtection'%}").then(response => {
+            let data = response.data
+            this.hide_spoilers = data.spoiler_protection[0].spoiler_protection
+            console.log(this.hide_spoilers)
+          })
+        },
+        // Returns a blank space rather than an empty array for rendering.
+        checkValue: function(value) {
+          if (!value) {
+            return ''
           }
-        })
-      },
-
-      getBookTags: function(item) {
-        axios.get("{% url 'APILibraryApp:bookTags' %}?bookID=" + item.bookID).then(response => {
-          let tagdata = response.data
-          item.user_tags = tagdata.UserTag
-        })
-      },
-
-      getComments: function(item) {
-        axios.get("{% url 'ProfileApp:getComments' %}?bookID=" + item.bookID).then(response => {
-          let data = response.data
-          item.comments = []
-          for (let i=0; i<data.comments.length; ++i) {
-            let comment = data.comments[i]
-            let user = comment.user
-            let date_created = comment.date_created
-            let date_edited = comment.date_edited
-            let progress_point = comment.progress_point
-            let text = comment.text
-            if (this.hide_spoilers && item.progress_point < progress_point)
-              text = "🖒 This comment has been filtered due to Spoiler Protection. 🖒"
-            item.comments.push({
-              user: user,
-              text: text,
-              date_created: date_created,
-              date_edited: date_edited,
-              progress_point: progress_point,
-            })
+          return value
+        },
+        // Retrieves all UserTag instances to be displayed in the drop down menu.
+        tagGen: function() {
+          axios.get("{% url 'APILibraryApp:getTags' %}").then(response => {
+            let data = response.data
+            this.tags = []
+            for (let i=0; i<data.tags.length; ++i) {
+              let name = data.tags[i].name
+              this.tags.push({
+                name: name,
+              })
+            }
+          })
+        },
+        // Retrieves all UserTags associated with the Book instance.
+        getBookTags: function(item) {
+          axios.get("{% url 'APILibraryApp:bookTags' %}?bookID=" + item.bookID).then(response => {
+            let tagdata = response.data
+            item.user_tags = tagdata.UserTag
+          })
+        },
+        // Retrieves all Comments associated with the Book instance.
+        getComments: function(item) {
+          axios.get("{% url 'ProfileApp:getComments' %}?bookID=" + item.bookID).then(response => {
+            let data = response.data
+            item.comments = []
+            for (let i=0; i<data.comments.length; ++i) {
+              let comment = data.comments[i]
+              let user = comment.user
+              let date_created = comment.date_created
+              let date_edited = comment.date_edited
+              let progress_point = comment.progress_point
+              let text = comment.text
+              if (this.hide_spoilers && item.progress_point < progress_point)
+                text = "🖒 This comment has been filtered due to Spoiler Protection. 🖒"
+              item.comments.push({
+                user: user,
+                text: text,
+                date_created: date_created,
+                date_edited: date_edited,
+                progress_point: progress_point,
+              })
+            }
+          })
+        },
+        // Searches the API for book with the entered id.
+        lookup: function(volume_id, progress) {
+          let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
+          let startIndex = (this.page - 1)*this.resultsPerPage
+          let maxResults = this.resultsPerPage
+          let config = {
+            params: {
+              startIndex: startIndex,
+              maxResults: maxResults,
+            }
           }
-        })
-      },
-
-      lookup: function(volume_id, progress) {
-        let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
-        let startIndex = (this.page - 1)*this.resultsPerPage
-        let maxResults = this.resultsPerPage
-        let config = {
-          params: {
-            startIndex: startIndex,
-            maxResults: maxResults,
+          // Parses json data into Item parameters then pushes them to the array for rendering index by index.
+          axios.get(url, config).then(response => {
+            let data = response.data
+            this.startIndex = response.data.startIndex
+            let bookID = data.id
+            let title = data.volumeInfo.title
+            let authors = data.volumeInfo.authors
+            let languages = data.volumeInfo.language
+            let page_count = data.volumeInfo.pageCount
+            if (!page_count)
+              page_count = 0
+            let publish_date = data.volumeInfo.publishedDate
+            publish_date = this.checkValue(publish_date)
+            let publisher = data.volumeInfo.publisher
+            publisher = this.checkValue(publisher)
+            let isbn_array = []
+            if (data.volumeInfo.industryIdentifiers)
+              isbn_array = data.volumeInfo.industryIdentifiers
+            let ebook = data.saleInfo.isEbook
+            let is_ebook = 'No'
+            if (ebook)
+              is_ebook = 'Yes'
+            let category_tags = []
+            if (data.volumeInfo.categories)
+              category_tags = data.volumeInfo.categories
+            let description = data.volumeInfo.description
+            description = this.checkValue(description)
+            let thumbnail = ''
+            if (data.volumeInfo.imageLinks)
+              thumbnail = data.volumeInfo.imageLinks.thumbnail
+            let progress_point = progress
+            item = {
+                bookID: bookID,
+                title: title,
+                authors: authors,
+                languages: languages,
+                page_count: page_count,
+                publish_date: publish_date,
+                publisher: publisher,
+                isbn_array: isbn_array,
+                ebook: ebook,
+                is_ebook: is_ebook,
+                category_tags: category_tags,
+                user_tags: [],
+                description: description,
+                thumbnail: thumbnail,
+                comments: [],
+                progress_point: progress_point
+              }
+              this.getBookTags(item)
+              this.getComments(item)
+              this.items.push(item)
+          })
+        },
+        // Updates the progress point parameter on the UserBook associated with the active User and the specific Book.
+        updateThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+            'progress_point': this.new_bookmark,
+            }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}',
+            },
           }
-        }
-        axios.get(url, config).then(response => {
-          let data = response.data
-          this.startIndex = response.data.startIndex
-          let bookID = data.id
-          let title = data.volumeInfo.title
-          let authors = data.volumeInfo.authors
-          let languages = data.volumeInfo.language
-          let page_count = data.volumeInfo.pageCount
-          if (!page_count)
-            page_count = 0
-          let publish_date = data.volumeInfo.publishedDate
-          publish_date = this.checkValue(publish_date)
-          let publisher = data.volumeInfo.publisher
-          publisher = this.checkValue(publisher)
-          let isbn_array = []
-          if (data.volumeInfo.industryIdentifiers)
-            isbn_array = data.volumeInfo.industryIdentifiers
-          let ebook = data.saleInfo.isEbook
-          let is_ebook = 'No'
-          if (ebook)
-            is_ebook = 'Yes'
-          let category_tags = []
-          if (data.volumeInfo.categories)
-            category_tags = data.volumeInfo.categories
-          let description = data.volumeInfo.description
-          description = this.checkValue(description)
-          let thumbnail = ''
-          if (data.volumeInfo.imageLinks)
-            thumbnail = data.volumeInfo.imageLinks.thumbnail
-          let progress_point = progress
-          item = {
-              bookID: bookID,
-              title: title,
-              authors: authors,
-              languages: languages,
-              page_count: page_count,
-              publish_date: publish_date,
-              publisher: publisher,
-              isbn_array: isbn_array,
-              ebook: ebook,
-              is_ebook: is_ebook,
-              category_tags: category_tags,
-              user_tags: [],
-              description: description,
-              thumbnail: thumbnail,
-              comments: [],
-              progress_point: progress_point
+          // Alerts based on HTML response.
+          axios.post("{% url 'ProfileApp:updateProgress' %}", data, config).then(response => {
+            item.progress_point = this.new_bookmark
+            if (response.data == 'failure') {
+              alert('Please log in.')
+            } else {
+              alert('Successfully updated.')
+            }
+          })
+        },
+        // Removes your UserBook relationship with this Book instance. (Not the Book itself.)
+        removeThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+          }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}',
+            },
+          }
+          axios.post("{% url 'ProfileApp:removeBook' %}", data, config).then(response => {
+            if (response.data == 'failure1') {
+              alert('Please log in.')
+            } else if (response.data == 'failure2'){
+              alert('Not added to MyShelf.')
+            } else {
+              alert('Successfully removed.')
+            }
+          })
+        },
+        // Creates a UserBook relationship for the current User.
+        saveThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+            'title': item.title,
+            'authors': item.authors,
+            'languages': item.languages,
+            'page_count': item.page_count,
+            'publish_date': item.publish_date,
+            'publisher': item.publisher,
+            'isbn': item.isbn_array.map(x => x.identifier).join(', '),
+            'ebook': item.ebook,
+            'category_tags': item.category_tags,
+            'description': item.description,
+            'thumbnail': item.thumbnail,
+          }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}',
+            },
+          }
+          axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(response => {
+            if (response.data == 'failure') {
+              alert('Please log in.')
+            } else if (response.data == 'already added') {
+              alert('Already added.')
+            } else {
+              alert('Successfully added.')
+            }
+          })
+        },
+        // Adds UserTag selected from dropdown menu to the Book instance.
+        tagThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+            'tag': this.select_tag
+          }
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}',
+            },
+          }
+          axios.post("{% url 'APILibraryApp:saveTags' %}", data, config).then(response => {
+            if (response.data == 'failure') {
+              alert('Please log in.')
+            } else if (response.data == 'already added') {
+              alert('Already added.')
+            } else {
+              alert('Successfully added')
             }
             this.getBookTags(item)
-            this.getComments(item)
-            this.items.push(item)
-        })
-      },
 
-      updateThis: function(item) {
-        let data = {
-          'bookID': item.bookID,
-          'progress_point': this.new_bookmark,
+          })
+        },
+        // Adds Comment to the Book instance.
+        commentThis: function(item) {
+          let data = {
+            'bookID': item.bookID,
+            'progress_point': this.progress_point,
+            'text': this.comment_text,
+            'user': "{{profile_user.username}}",
           }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}',
-          },
-        }
-        axios.post("{% url 'ProfileApp:updateProgress' %}", data, config).then(response => {
-          item.progress_point = this.new_bookmark
-          if (response.data == 'failure') {
-            alert('Please log in.')
-          } else {
-            alert('Successfully updated.')
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}'
+            },
           }
-        })
-      },
-
-      removeThis: function(item) {
-        let data = {
-          'bookID': item.bookID,
-        }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}',
-          },
-        }
-        axios.post("{% url 'ProfileApp:removeBook' %}", data, config).then(response => {
-          if (response.data == 'failure1') {
-            alert('Please log in.')
-          } else if (response.data == 'failure2'){
-            alert('Not added to MyShelf.')
-          } else {
-            alert('Successfully removed.')
-          }
-        })
-      },
-
-      saveThis: function(item) {
-        let data = {
-          'bookID': item.bookID,
-          'title': item.title,
-          'authors': item.authors,
-          'languages': item.languages,
-          'page_count': item.page_count,
-          'publish_date': item.publish_date,
-          'publisher': item.publisher,
-          'isbn': item.isbn_array.map(x => x.identifier).join(', '),
-          'ebook': item.ebook,
-          'category_tags': item.category_tags,
-          'description': item.description,
-          'thumbnail': item.thumbnail,
-        }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}',
-          },
-        }
-        axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(response => {
-          if (response.data == 'failure') {
-            alert('Please log in.')
-          } else if (response.data == 'already added') {
-            alert('Already added.')
-          } else {
-            alert('Successfully added.')
-          }
-        })
-      },
-
-      tagThis: function(item) {
-        let data = {
-          'bookID': item.bookID,
-          'tag': this.select_tag
-        }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}',
-          },
-        }
-        axios.post("{% url 'APILibraryApp:saveTags' %}", data, config).then(response => {
-          if (response.data == 'failure') {
-            alert('Please log in.')
-          } else if (response.data == 'already added') {
-            alert('Already added.')
-          } else {
-            alert('Successfully added')
-          }
-          this.getBookTags(item)
-
-        })
-      },
-
-      commentThis: function(item) {
-        let data = {
-          'bookID': item.bookID,
-          'progress_point': this.progress_point,
-          'text': this.comment_text,
-          'user': "{{profile_user.username}}",
-        }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}'
-          },
-        }
-        axios.post("{% url 'ProfileApp:makeComment' %}", data, config).then(response => {
-          let data = response.data
-          if (response.data == 'failure') {
-            alert('Please log in.')
-          } else {
-            alert('Successfully posted')
-          }
-          this.getComments(item)
-        })
-      },
-
-      getUserBooks: function() {
-        let data = {
-          user: "{{profile_user.username}}",
-        }
-        let config = {
-          headers: {
-            'X-CSRFToken': '{{csrf_token}}'
-          },
-        }
-        axios.post("{% url 'APILibraryApp:getUserBooks' %}", data, config).then(response => {
-          let data = response.data
-          for (let i=0; i<data.userbooks.length; ++i) {
-            let id = data.userbooks[i].id
-            let bookID = data.userbooks[i].book
-            let progress = 0
-            progress += data.userbooks[i].progress
-            userbook = {
-              'id': id,
-              'bookID': bookID,
-              'progress': progress,
+          axios.post("{% url 'ProfileApp:makeComment' %}", data, config).then(response => {
+            let data = response.data
+            if (response.data == 'failure') {
+              alert('Please log in.')
+            } else {
+              alert('Successfully posted')
             }
-            this.userbooks.push(userbook)
+            this.getComments(item)
+          })
+        },
+        // Retrieves all UserBook relationships associated with the User of this UserProfile.
+        // Pushes these to an array for rendering index by index.
+        getUserBooks: function() {
+          let data = {
+            user: "{{profile_user.username}}",
           }
-          for (let i=0; i<this.userbooks.length; i++) {
-            this.lookup(this.userbooks[i].bookID, this.userbooks[i].progress)
+          let config = {
+            headers: {
+              'X-CSRFToken': '{{csrf_token}}'
+            },
           }
-        })
+          axios.post("{% url 'APILibraryApp:getUserBooks' %}", data, config).then(response => {
+            let data = response.data
+            for (let i=0; i<data.userbooks.length; ++i) {
+              let id = data.userbooks[i].id
+              let bookID = data.userbooks[i].book
+              let progress = 0
+              progress += data.userbooks[i].progress
+              userbook = {
+                'id': id,
+                'bookID': bookID,
+                'progress': progress,
+              }
+              this.userbooks.push(userbook)
+            }
+            for (let i=0; i<this.userbooks.length; i++) {
+              this.lookup(this.userbooks[i].bookID, this.userbooks[i].progress)
+            }
+          })
+        },
       },
+    // Runs on entering the page, populates all rendering fields with info retrieved from json calls. 
+    created: function() {
+      this.spoilerProtection()
+      this.getUserBooks()
+      this.tagGen()
     },
-
-  created: function() {
-    this.spoilerProtection()
-    this.getUserBooks()
-    this.tagGen()
-  },
-})
-</script>
+  })
+  </script>
 {% endblock %}

@@ -50,6 +50,7 @@
       </div>
     </div>
   </div>
+  
   <script type="text/javascript">
     let APILibrary = new Vue({
       el: '#APILibrary',
@@ -62,6 +63,7 @@
       },
 
       methods: {
+        // Controls Navigator Bar
         pageForward: function() {
           this.page += 1
           this.lookup()
@@ -78,21 +80,21 @@
           this.page = 1
           this.lookup()
         },
-
+        // Returns a blank space rather than an empty array for rendering.
         checkValue: function(value) {
           if (!value) {
             return ''
           }
           return value
         },
-
+        // Retrieves all UserTags associated with the Book instance.
         getBookTags: function(item) {
           axios.get("{% url 'APILibraryApp:bookTags' %}?bookID=" + item.bookID).then(response => {
             let tagdata = response.data
             item.user_tags = tagdata.UserTag
           })
         },
-
+        // Searches the API in all text fields for the entered string.
         lookup: function() {
           let url = "https://www.googleapis.com/books/v1/volumes?"
           let startIndex = (this.page - 1)*this.resultsPerPage
@@ -103,6 +105,7 @@
               maxResults: this.resultsPerPage
             }
           }
+          // Parses json data into Item parameters then pushes them to the array for rendering index by index.
           axios.get(url, config).then(response => {
             let data = response.data
             this.items = []
@@ -156,7 +159,8 @@
             }
           })
         },
-
+        // Checks to see if a Book instance for this bookID has been created, and if not, creates one.
+        // Creates a corresponding UserBook relationship.
         saveThis: function(item) {
           let data = {
             'bookID': item.bookID,
@@ -177,6 +181,7 @@
               'X-CSRFToken': '{{csrf_token}}'
             }
           }
+          // Alerts based on HTML response.
           axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(response => {
             if (response.data == 'failure') {
               alert('Please log in.')

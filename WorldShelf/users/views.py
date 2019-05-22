@@ -6,9 +6,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from ProfileApp.models import UserProfile
 
+'''Renders Register/Login Page'''
 def register_login(request):
     return render(request, 'users/register_login.html')
 
+'''Registers User and also creates a UserProfile instance'''
+# Standard User registration function.
+# Creates a UserProfile instance using info entered from the request.
 def register_user(request):
     username = request.POST['username']
     if User.objects.filter(username = username).exists():
@@ -26,6 +30,7 @@ def register_user(request):
     login(request, user)
     return HttpResponseRedirect(reverse('users:protected'))
 
+'''Login functions'''
 @login_required
 def protected(request):
     print(request.user.username) # able to access the user immediately

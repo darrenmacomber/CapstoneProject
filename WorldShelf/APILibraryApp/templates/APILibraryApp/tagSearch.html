@@ -14,12 +14,13 @@
         <button v-on:click="tagLookup">🔎</button>
       </div>
     </div>
-  <!-- Display tag search results; searches extant Book objects for tag on click -->
+    <!-- Display tag search results; searches extant Book objects for tag on click -->
     <div class="data_field" id="tag_data">
       <div class="container" id="tag_entry" v-for="tagbutton in tagbuttons">
         <div class="entry_field"><a id="add_button" v-on:click="findTaggedBooks(tagbutton.name)">[[ tagbutton.name ]]</a></div>
       </div>
     </div>
+    <!-- Data container displaying information on books drawn from API and UserTag/Book tables -->
     <div class="data_field" id="book_data">
       <div class="container" id="book_entry" v-for="item in items">
         <div class="image"><img v-bind:src="item.thumbnail"/></div>
@@ -41,10 +42,9 @@
     </div>
   </div>
 
-
-  <!-- Data container displaying information on books drawn from API and UserTag/Book tables -->
   <script type="text/javascript">
 
+    //Checks string for contents of text.
     function contains(text, query) {
       return text.toLowerCase().indexOf(query.toLowerCase()) != -1
     }
@@ -63,13 +63,14 @@
       },
 
       methods: {
+        // Returns a blank space rather than an empty array for rendering.
         checkValue: function(value) {
           if (!value) {
             return ''
           }
           return value
         },
-
+        // Searches all UserTags that contain the query string.
         tagLookup: function() {
           axios.get("{% url 'APILibraryApp:getTags' %}").then(response => {
             let data = response.data
@@ -84,7 +85,7 @@
             }
           })
         },
-
+        // Searches all Books associated with the clicked UserTag.
         findTaggedBooks: function(target_tag) {
           let data = {
             'target_tag': target_tag
@@ -109,14 +110,14 @@
             }
           })
         },
-
+        // Retrieves all UserTags associated with the Book instance.
         getBookTags: function(item) {
           axios.get("{% url 'APILibraryApp:bookTags' %}?bookID=" + item.bookID).then(response => {
             let tagdata = response.data
             item.user_tags = tagdata.UserTag
           })
         },
-
+        // Searches the API for book with the entered id.
         bookLookup: function(volume_id) {
           let url = "https://www.googleapis.com/books/v1/volumes/" + volume_id + '/'
           let startIndex = (this.page - 1)*this.resultsPerPage
@@ -127,6 +128,7 @@
               maxResults: maxResults,
             }
           }
+          // Parses json data into Item parameters then pushes them to the array for rendering index by index.
           axios.get(url, config).then(response => {
             let data = response.data
             this.startIndex = response.data.startIndex
@@ -176,7 +178,7 @@
               this.items.push(item)
           })
         },
-
+        // Creates a UserBook relationship for the current User.
         saveThis: function(item) {
           let data = {
             'bookID': item.bookID,
@@ -197,6 +199,7 @@
               'X-CSRFToken': '{{csrf_token}}'
             }
           }
+          // Alerts based on HTML response.
           axios.post("{% url 'APILibraryApp:saveBook' %}", data, config).then(response => {
             if (response.data == 'failure') {
               alert('Please log in.')
@@ -207,7 +210,7 @@
             }
           })
         },
-
+        // Adds UserTag selected from dropdown menu to the Book instance.
         tagThis: function(item) {
           let data = {
             'bookID': item.bookID,

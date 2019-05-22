@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 
 import datetime
 
+'''Represents the additional data associated with the User'''
+# Extra data that is used to populate the Profile page and MyShelf.
+# Spoiler Protection is a boolean parameter that prevents user from reading comment text further in a given Book than they are.
+# Date is an extracted string made from a datetime object.
 class UserProfile(models.Model):
     username = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
