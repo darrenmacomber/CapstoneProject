@@ -171,6 +171,9 @@ def removeBook(request):
 '''Renders the Edit Profile page'''
 @login_required
 def editProfile(request):
+    context = {
+        'username': request.user,
+    }
     if not request.user.is_authenticated:
         return HttpResponseRedirect('users/register_login.html')
-    return render(request, 'ProfileApp/editProfile.html')
+    return render(request, 'ProfileApp/editProfile.html', context)

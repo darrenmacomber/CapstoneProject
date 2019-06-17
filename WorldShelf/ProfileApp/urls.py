@@ -13,6 +13,6 @@ urlpatterns = [
     path('getComments/', views.getComments, name = 'getComments'),
     path('makeComment/', views.makeComment, name='makeComment'),
     path('removeBook/', views.removeBook, name='removeBook'),
-    path('edit/', views.editProfile, name='editProfile'),
+    path('editProfile/<str:username>/', views.editProfile, name='editProfile'),
 
 ]
