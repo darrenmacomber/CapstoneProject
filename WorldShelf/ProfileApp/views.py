@@ -170,7 +170,7 @@ def removeBook(request):
 
 '''Renders the Edit Profile page'''
 @login_required
-def editProfile(request):
+def editProfile(request, username):
     context = {
         'username': request.username,
     }
