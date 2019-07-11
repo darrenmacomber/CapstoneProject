@@ -172,7 +172,7 @@ def removeBook(request):
 @login_required
 def editProfile(request):
     context = {
-        'username': request.username,
+        'username': user.username,
     }
     if not request.user.is_authenticated:
         return HttpResponseRedirect('users/register_login.html')
