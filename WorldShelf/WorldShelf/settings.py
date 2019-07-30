@@ -25,7 +25,7 @@ SECRET_KEY = '*_*kl=$gzs58c&10s@i9rsl!!dm!l_3vbl(2cde9g-dmb60x0j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['worldshelf.pdxstudents.com']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
